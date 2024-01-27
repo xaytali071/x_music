@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "623585268228",
+    "project_id": "xmusic-22c7a",
+    "storage_bucket": "xmusic-22c7a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623585268228:android:52faad4ee86512c5f1db51",
+        "android_client_info": {
+          "package_name": "uz.xmusic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApDPnM_HprhyiQc4C8u7MILqLKEMHt4mQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
