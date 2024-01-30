@@ -8,13 +8,15 @@ class UserState {
   String verificationId;
   String phone;
   String? errorText;
-  final String? image;
+  final String? imageUrl;
   final String? imagePath;
-  bool phonee;
+  bool isHide;
   bool name;
   bool pass;
+  bool email;
   bool check;
-  bool checkPass;
+ // bool checkPass;
+  bool checkConfirm;
 
   UserState({
     this.isFacebookLoading = false,
@@ -24,13 +26,15 @@ class UserState {
     this.phone = '',
     this.errorText,
     this.userModel,
-    this.image,
+    this.imageUrl,
     this.imagePath,
     this.name=true,
     this.pass=true,
-    this.phonee=true,
+    this.isHide=true,
     this.check=false,
-    this.checkPass=false,
+    this.email=true,
+    this.checkConfirm=true,
+   // this.checkPass=true,
   });
 
   UserState copyWith(
@@ -41,13 +45,15 @@ class UserState {
       String? phone,
       String? verificationId,
       UserModel? userModel,
-      String? image,
+      String? imageUrl,
        String? imagePath,
-        bool? phonee,
+        bool? isHide,
         bool? name,
+        bool? email,
         bool? pass,
         bool? check,
-        bool? checkPass,
+       // bool? checkPass,
+        bool? checkConfirm,
       }) {
     return UserState(
       isFacebookLoading: isFacebookLoading ?? this.isFacebookLoading,
@@ -57,13 +63,15 @@ class UserState {
       phone: phone ?? this.phone,
       userModel: userModel ?? this.userModel,
       verificationId: verificationId ?? this.verificationId,
-      image: image ?? this.image,
+      imageUrl: imageUrl ?? this.imageUrl,
       imagePath: imagePath ?? imagePath,
       pass: pass ?? this.pass,
       name: name ?? this.name,
-      phonee: phonee ?? this.phonee,
+      isHide: isHide ?? this.isHide,
       check: check ?? this.check,
-      checkPass: checkPass ?? this.checkPass,
+      email: email ?? this.email,
+     // checkPass: checkPass ?? this.checkPass,
+      checkConfirm: checkConfirm ?? this.checkConfirm
     );
   }
 }

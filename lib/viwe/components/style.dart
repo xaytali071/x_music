@@ -12,6 +12,7 @@ class Style {
   static const whiteColor50=Color(0x60FFFFFF);
   static const darkPrimaryColor=Color(0x70453671);
   static const primaryColor=Color(0xFFDAD4EC);
+  static const redColor=Color(0xffF20826);
   static const transperntColor=Colors.transparent;
 
 

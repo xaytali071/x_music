@@ -6,9 +6,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/controller/app_controller/app_cubit.dart';
 import 'package:xmusic/controller/aud/audio_cubit.dart';
 import 'package:xmusic/controller/aud/audio_state.dart';
+import 'package:xmusic/controller/user_controller/user_cubit.dart';
+import 'package:xmusic/controller/user_controller/user_state.dart';
 import 'package:xmusic/viwe/add/add_page.dart';
+import 'package:xmusic/viwe/components/avatar_image.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
 import 'package:xmusic/viwe/components/banner.dart';
+import 'package:xmusic/viwe/components/button_effect.dart';
 import 'package:xmusic/viwe/components/custom_category.dart';
 import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/components/tab_widget.dart';
@@ -32,6 +36,7 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       context.read<AudioCubit>().getMusic();
       context.read<AppCubit>().getMode();
+      context.read<UserCubit>().getUser();
     });
     super.initState();
   }
@@ -74,20 +79,11 @@ class _HomePageState extends State<HomePage> {
                             style: Style.boldText(),
                           ),
                           const Spacer(),
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.search,
-                                color: Style.blackColor,
-                              )),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const AddProduct()));
-                              },
-                              icon: const Icon(Icons.person))
+                          BlocBuilder<UserCubit, UserState>(
+  builder: (context, state) {
+    return AvatarImage(image: state.userModel?.avatar ?? "",size: 30,);
+  },
+)
                         ],
                       ),
                     ),
@@ -109,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                               selIndex = index;
                               context.read<AudioCubit>()
                                 ..onMode()
-                                ..getAudio(state.listOfMusic?[index].track ?? "");
+                                ..getAudio(state.listOfMusic?[index].track ?? "")..playy();
 
                               showBottomSheet(
                                   context: context,
@@ -322,59 +318,61 @@ class _HomePageState extends State<HomePage> {
                             },
                             child: BlocBuilder<AudioCubit, AudioState>(
                               builder: (context, state) {
-                                return Container(
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal: 10.w, vertical: 5.h),
-                                  width: MediaQuery.sizeOf(context).width,
-                                  height: 70.h,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    color: const Color(0xFFDAD4EC)
-                                        .withOpacity(0.2),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      CustomImageNetwork(
-                                          image:
-                                              state.listOfMusic?[index].image,
-                                          width: 80,
-                                          height: 80),
-                                      10.horizontalSpace,
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                              width: 250.w,
-                                              child: Text(
-                                                state.listOfMusic?[index]
-                                                        .artist ??
-                                                    "",
-                                                style: Style.normalText(
-                                                    color: state.darkMode
-                                                        ? Style.whiteColor50
-                                                        : Style.blackColor),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                              )),
-                                          SizedBox(
-                                              width: 250.w,
-                                              child: Text(
-                                                state.listOfMusic?[index]
-                                                        .trackName ??
-                                                    "",
-                                                style: Style.miniText(
-                                                    color: state.darkMode
-                                                        ? Style.whiteColor50
-                                                        : Style.blackColor),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                              ))
-                                        ],
-                                      )
-                                    ],
+                                return AnimationButtonEffect(
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 10.w, vertical: 5.h),
+                                    width: MediaQuery.sizeOf(context).width,
+                                    height: 70.h,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      color: const Color(0xFFDAD4EC)
+                                          .withOpacity(0.2),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        CustomImageNetwork(
+                                            image:
+                                                state.listOfMusic?[index].image,
+                                            width: 80,
+                                            height: 80),
+                                        10.horizontalSpace,
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                                width: 250.w,
+                                                child: Text(
+                                                  state.listOfMusic?[index]
+                                                          .artist ??
+                                                      "",
+                                                  style: Style.normalText(
+                                                      color: state.darkMode
+                                                          ? Style.whiteColor50
+                                                          : Style.blackColor),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                )),
+                                            SizedBox(
+                                                width: 250.w,
+                                                child: Text(
+                                                  state.listOfMusic?[index]
+                                                          .trackName ??
+                                                      "",
+                                                  style: Style.miniText(
+                                                      color: state.darkMode
+                                                          ? Style.whiteColor50
+                                                          : Style.blackColor),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ))
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 );
                               },

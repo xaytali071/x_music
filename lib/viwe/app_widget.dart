@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/controller/app_controller/app_cubit.dart';
 import 'package:xmusic/controller/aud/audio_cubit.dart';
+import 'package:xmusic/controller/localStore/local_store.dart';
+import 'package:xmusic/controller/user_controller/user_cubit.dart';
+import 'package:xmusic/viwe/pages/auth/register_page.dart';
 import 'package:xmusic/viwe/pages/home/home_page.dart';
 
 import '../controller/audio_state/audio_cubit.dart';
@@ -43,8 +46,9 @@ class _AppWidgetState extends State<AppWidget> {
               providers: [
               BlocProvider(create: (_)=>AudioCubit()),
                 BlocProvider(create: (_)=>AppCubit()),
+                BlocProvider(create: (_)=>UserCubit()),
               ],
-              child: const HomePage(),
+              child: LocaleStore.getId()==null ? RegisterPage() : HomePage(),
             ),
           );
         }

@@ -12,7 +12,20 @@
           "package_name": "uz.xmusic"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "623585268228-qtonu09m4kgfkjqoko3qkl5id70grana.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uz.xmusic",
+            "certificate_hash": "25c6bf3482d074ff5fa937f112b1a681d17f96c5"
+          }
+        },
+        {
+          "client_id": "623585268228-td3vjlfkf7hvf9s0su8g56gvpl4gvds6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyApDPnM_HprhyiQc4C8u7MILqLKEMHt4mQ"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623585268228-td3vjlfkf7hvf9s0su8g56gvpl4gvds6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

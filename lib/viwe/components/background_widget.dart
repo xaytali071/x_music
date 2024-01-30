@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xmusic/controller/app_controller/app_cubit.dart';
 import 'package:xmusic/controller/app_controller/app_state.dart';
+import 'package:xmusic/controller/user_controller/user_cubit.dart';
+import 'package:xmusic/controller/user_controller/user_state.dart';
 import 'package:xmusic/viwe/pages/home/dwower_widget.dart';
 
 class BackGroundWidget extends StatefulWidget {
@@ -20,7 +22,11 @@ class _BackGroundWidgetState extends State<BackGroundWidget> {
       key: _key,
       endDrawerEnableOpenDragGesture: false,
       drawerEnableOpenDragGesture: false,
-      drawer: DrawerWidget(dkey: _key,),
+      drawer: BlocBuilder<UserCubit, UserState>(
+  builder: (context, state) {
+    return DrawerWidget(dkey: _key, userInfo: state.userModel,);
+  },
+),
       body: SingleChildScrollView(
         child: BlocBuilder<AppCubit, AppState>(
   builder: (context, state) {
