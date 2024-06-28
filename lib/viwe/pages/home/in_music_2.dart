@@ -47,7 +47,7 @@ class _InMusicPageState extends State<InMusicPage> {
                    children: [
                      100.verticalSpace,
                      CustomImageNetwork(
-                       image: widget.music?[selIndex].image ?? "",
+                       image: widget.music?[selIndex].artistData?.image ?? "",
                        width: 250,
                        height: 250,
                        radius: 16,
@@ -55,7 +55,7 @@ class _InMusicPageState extends State<InMusicPage> {
                      10.verticalSpace,
                      Center(
                        child: Text(
-                         widget.music?[selIndex].artist ?? "",
+                         widget.music?[selIndex].artistData?.name ?? "",
                          style: Style.normalText(
                              color: state.darkMode
                                  ? Style.whiteColor
@@ -78,6 +78,13 @@ class _InMusicPageState extends State<InMusicPage> {
                              .player
                              .positionStream,
                          builder: (context, snapshot) {
+                           if(snapshot.data==widget.context.read<AudioCubit>().player.duration && selIndex!=widget.music!.length-1){
+                             widget.context.read<AudioCubit>()
+                               ..pause()
+                               ..nextMusic(
+                                   widget.music![++selIndex])..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
+                             setState(() {});
+                           }
                            return ProgressBar(
                              progress: snapshot.data ??
                                  const Duration(seconds: 0),
@@ -104,7 +111,7 @@ class _InMusicPageState extends State<InMusicPage> {
                                        ..pervous(
                                          widget.music![--selIndex],
                                        )
-                                  ..getAudio(widget.music?[selIndex].track ?? "")..playy();
+                                  ..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
                                          setState(() {});
                                    }
                                  },
@@ -140,7 +147,7 @@ class _InMusicPageState extends State<InMusicPage> {
                                      widget.context.read<AudioCubit>()
                                        ..pause()
                                        ..nextMusic(
-                                           widget.music![++selIndex])..getAudio(widget.music?[selIndex].track ?? "")..playy();
+                                           widget.music![++selIndex])..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
                                     setState(() {});
                                    }
                                  },

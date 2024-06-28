@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:xmusic/model/author_model.dart';
 import 'package:xmusic/model/music_model.dart';
 
 import '../../controller/audio_state/audio_cubit.dart';
@@ -102,10 +103,9 @@ class _AddProductState extends State<AddProduct> {
                       firestore
                           .collection("music")
                           .add(MusicModel(
-                          image: imageUrl,
-                          artist: authorController.text,
+                          artistData: AuthorModel(),
                           trackName: trackNameController.text,
-                          track: musicUrl)
+                          trackUrl: musicUrl)
                           .toJson())
                           .then((value) {
                         isLoading = false;

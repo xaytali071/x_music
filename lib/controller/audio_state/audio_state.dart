@@ -1,5 +1,7 @@
 import 'package:xmusic/model/music_model.dart';
 
+import '../../model/author_model.dart';
+
 
 class AudioState {
    bool isPlay;
@@ -12,7 +14,12 @@ class AudioState {
   final List<String>? listOfDoc;
   final String? localAudioPath;
   bool darkMode;
+  String? imagePath;
   final MusicModel? music;
+   List<AuthorModel>? listOfAuthor;
+   String? audio;
+   String? imageUrl;
+   List<MusicModel>? listOfMusicArtist;
   AudioState(
       {this.selectIndex = 0,
       this.isPlay = true,
@@ -24,7 +31,12 @@ class AudioState {
       this.listOfDoc,
         this.localAudioPath,
         this.darkMode=false,
-        this.music
+        this.music,
+        this.imagePath,
+        this.listOfAuthor,
+        this.audio,
+        this.imageUrl,
+        this.listOfMusicArtist,
       });
 
   AudioState copyWith({
@@ -38,7 +50,13 @@ class AudioState {
     List<String>? listOfDoc,
     String? localAudioPath,
     bool? darkMode,
-    MusicModel? music
+    MusicModel? music,
+    String? imagePath,
+    List<AuthorModel>? listOfAuthor,
+    String? audio,
+     String? imageUrl,
+    List<MusicModel>? listOfMusicArtist,
+
   }) {
     return AudioState(
       isPlay: isPlay ?? this.isPlay,
@@ -52,6 +70,11 @@ class AudioState {
       localAudioPath: localAudioPath ?? this.localAudioPath,
       darkMode: darkMode ?? this.darkMode,
       music: music ?? this.music,
+      imagePath: imagePath ?? this.imagePath,
+      listOfAuthor: listOfAuthor ?? this.listOfAuthor,
+        audio: audio ?? this.audio,
+      imageUrl: imageUrl ?? this.imageUrl,
+      listOfMusicArtist: listOfMusicArtist ?? this.listOfMusicArtist,
     );
   }
 }

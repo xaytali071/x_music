@@ -7,7 +7,7 @@ import 'package:xmusic/controller/app_controller/app_state.dart';
 import 'package:xmusic/controller/aud/audio_cubit.dart';
 import 'package:xmusic/controller/aud/audio_state.dart';
 import 'package:xmusic/viwe/components/style.dart';
-import 'package:xmusic/viwe/pages/home/music3.dart';
+import 'package:xmusic/viwe/pages/home/search_page.dart';
 
 import '../../controller/audio_state/audio_cubit.dart';
 import '../../controller/audio_state/audio_state.dart';
@@ -46,24 +46,8 @@ class TabWidget extends StatelessWidget {
   builder: (context, state) {
     return Center(
                   child: GestureDetector(
-                      onTap: () {
-                        context.read<AudioCubit>().getLocaleMusic(() {
-                         // path=state.localeAudioPath ?? "";
-                          Navigator.push(context, MaterialPageRoute(builder: (_)=>MultiBlocProvider(
-  providers: [
-    BlocProvider(
-  create: (context) => AppCubit(),
-),
-    BlocProvider(
-      create: (context) => AudioCubit(),
-    ),
-  ],
-  child: Music3(music: path),
-)));
-                        });
-                        
-                      },
-                      child:  Text("Locale",style: Style.normalText(color: state.darkMode ? Style.whiteColor50 : Style.blackColor50)))
+                      onTap: (){},
+                      child:  Text("Search",style: Style.normalText(color: state.darkMode ? Style.whiteColor50 : Style.blackColor50)))
               );
   },
 )

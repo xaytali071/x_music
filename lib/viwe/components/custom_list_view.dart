@@ -57,7 +57,7 @@ class _CustomListViewState extends State<CustomListView> {
                   child: Row(
                     children: [
                       CustomImageNetwork(
-                          image: widget.list?[index].image, width: 80, height: 80),
+                          image: widget.list?[index].artistData?.image ?? "", width: 80, height: 80),
                       10.horizontalSpace,
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -66,7 +66,7 @@ class _CustomListViewState extends State<CustomListView> {
                           SizedBox(
                               width: 250.w,
                               child: Text(
-                                widget.list?[index].artist ?? "",
+                                widget.list?[index].artistData?.name ?? "",
                                 style: Style.normalText(
                                     color: state.darkMode
                                         ? Style.whiteColor50

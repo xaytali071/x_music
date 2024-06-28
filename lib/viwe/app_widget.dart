@@ -48,7 +48,7 @@ class _AppWidgetState extends State<AppWidget> {
                 BlocProvider(create: (_)=>AppCubit()),
                 BlocProvider(create: (_)=>UserCubit()),
               ],
-              child: LocaleStore.getId()==null ? RegisterPage() : HomePage(),
+              child: LocaleStore.getId()==null ? HomePage() : HomePage(),
             ),
           );
         }

@@ -1,26 +1,42 @@
+import 'package:xmusic/model/author_model.dart';
+
 class MusicModel{
-  final String? image;
-  final String? track;
-  final String? trackName;
-  final String? artist;
-  MusicModel({this.image, this.track, this.trackName, this.artist});
+   String? trackUrl;
+   String? trackName;
+   AuthorModel? artistData;
+  num? rating;
+  String? artistId;
+  String? ganre;
+  int? year;
+  String? other;
+  String? id;
+  MusicModel({this.trackUrl, this.trackName, this.artistData,this.rating,this.ganre,this.artistId,this.year,this.other,this.id});
 
 
-  factory MusicModel.fromJson({ required Map<String,dynamic>? data}){
+  factory MusicModel.fromJson({ required Map<String,dynamic>? data,required AuthorModel? authorData,required String id}){
     return MusicModel(
-      image: data?["image"],
-      track: data?["track"],
+      trackUrl: data?["track"],
       trackName: data?["trackName"],
-      artist: data?["artist"],
+      artistData: authorData,
+      rating: data?["rating"],
+      ganre: data?["ganre"],
+      artistId: data?["artistId"],
+      year: data?["year"],
+      other: data?["other"],
+      id: id
+
     );
   }
 
   toJson(){
     return {
-      "image": image,
-      "artist":artist,
-      "track":track,
+      "track":trackUrl,
       "trackName":trackName,
+      "rating":rating,
+      "ganre":ganre,
+      "artistId":artistId,
+      "year":year,
+      "other":other,
     };
   }
 }
