@@ -13,9 +13,9 @@ class MusicModel{
   MusicModel({this.trackUrl, this.trackName, this.artistData,this.rating,this.ganre,this.artistId,this.year,this.other,this.id});
 
 
-  factory MusicModel.fromJson({ required Map<String,dynamic>? data,required AuthorModel? authorData,required String id}){
+  factory MusicModel.fromJson({ required Map<String,dynamic>? data,required AuthorModel? authorData,required String id,required String audUrl}){
     return MusicModel(
-      trackUrl: data?["track"],
+      trackUrl: audUrl,
       trackName: data?["trackName"],
       artistData: authorData,
       rating: data?["rating"],

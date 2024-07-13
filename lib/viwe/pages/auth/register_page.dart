@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/controller/app_controller/app_cubit.dart';
-import 'package:xmusic/controller/audio_state/audio_cubit.dart';
+import 'package:xmusic/controller/providers.dart';
 import 'package:xmusic/controller/user_controller/user_cubit.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
@@ -14,17 +13,17 @@ import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/pages/auth/sign_up_page.dart';
 import 'package:xmusic/viwe/pages/home/home_page.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   void initState() {
-    context.read<UserCubit>()
+    ref.read(userProvider.notifier)
       ..changeName(false)
       ..checkConfirmPassword("12345678", "12345678")
       ..errorText("");
@@ -36,14 +35,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserState watch=ref.watch(userProvider);
+    final event=ref.read(userProvider.notifier);
     return KeyboardDissimer(
       child: BackGroundWidget(
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: BlocBuilder<UserCubit, UserState>(
-              builder: (context, state) {
-                return Column(
+            child: Column(
                   children: [
                     100.verticalSpace,
                     Text(
@@ -55,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       hint: "Email",
                       controller: email,
                       onChanged: (s) {
-                        context.read<UserCubit>().changeEmail(s.isEmpty);
+                        event.changeEmail(s.isEmpty);
                       },
                       perfix: Icon(
                         Icons.email,
@@ -66,9 +65,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     CustomTextFormField(
                       hint: "Password",
                       controller: password,
-                      obscure: state.isHide,
+                      obscure: watch.isHide,
                       onChanged: (s) {
-                        context.read<UserCubit>().checkPassword(s);
+                        event.checkPassword(s);
                       },
                       perfix: const Icon(
                         Icons.lock,
@@ -76,9 +75,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       sufix: GestureDetector(
                           onTap: () {
-                            context.read<UserCubit>().hidePassword();
+                            event.hidePassword();
                           },
-                          child: state.isHide
+                          child: watch.isHide
                               ? const Icon(
                                   Icons.visibility,
                                   color: Style.darkPrimaryColor,
@@ -89,45 +88,31 @@ class _RegisterPageState extends State<RegisterPage> {
                                 )),
                     ),
                     10.verticalSpace,
-                    (state.errorText?.isEmpty ?? false)
+                    (watch.errorText.isEmpty ?? false)
                         ? SizedBox.shrink()
                         : Text(
-                            state.errorText ?? "",
+                            watch.errorText ?? "",
                             style: Style.normalText(color: Style.redColor),
                           ),
                     100.verticalSpace,
-                    state.check
+                    watch.check
                         ? CustomButton(
                             text: "Next",
                             onTap: () {
-                              context
-                                  .read<UserCubit>()
+                              event
                                   .login(email: email.text,password: password.text,onSuccess:  () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => MultiBlocProvider(
-                                              providers: [
-                                                BlocProvider(
-                                                  create: (context) =>
-                                                      AppCubit(),
-                                                ),
-                                                BlocProvider(
-                                                  create: (context) =>
-                                                      AudioCubit(),
-                                                ),
-                                              ],
-                                              child: HomePage(),
-                                            )));
+                                        builder: (_) => const HomePage()));
                               });
                             },
                             color: Style.darkPrimaryColor,
                           )
-                        : state.isLoading ? CircularProgressIndicator() :CustomButton(
+                        : watch.isLoading ? const CircularProgressIndicator() :CustomButton(
                             text: "Next",
                             onTap: () {
-                              context
-                                  .read<UserCubit>()
+                              event
                                   .errorText("Email or password empty");
                             },
                             color: Style.primaryColor.withOpacity(0.5),
@@ -168,18 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => MultiBlocProvider(
-                                            providers: [
-                                              BlocProvider(
-                                                create: (context) =>
-                                                    UserCubit(),
-                                              ),
-                                              BlocProvider(
-                                                create: (context) => AppCubit(),
-                                              ),
-                                            ],
-                                            child: SignUpPage(),
-                                          )));
+                                      builder: (_) => SignUpPage()));
                             },
                             child: Text(
                               "Sign up",
@@ -189,9 +163,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       ],
                     )
                   ],
-                );
-              },
-            ),
+                )
+
           ),
         ),
       ),

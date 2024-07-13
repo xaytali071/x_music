@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/controller/audio_state/audio_cubit.dart';
 import 'package:xmusic/viwe/add/add_new_author.dart';
+import 'package:xmusic/viwe/components/custom_text_form_field.dart';
 
 import 'add_new_music.dart';
 
@@ -16,6 +16,7 @@ class HomePage2 extends StatefulWidget {
 }
 
 class _HomePage2State extends State<HomePage2> {
+  TextEditingController url=TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,20 +26,16 @@ class _HomePage2State extends State<HomePage2> {
             50.verticalSpace,
             ElevatedButton(onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) =>
-                  BlocProvider(
-                    create: (context) => AudioCubit(),
-                    child: AddNewAuthorPage(),
-                  )));
+                  AddNewAuthorPage()));
             }, child: Text("Add Author")),
             20.verticalSpace,
             ElevatedButton(onPressed: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (_) =>
-                  BlocProvider(
-                    create: (context) => AudioCubit(),
-                    child: AddNewMusic(),
-                  )));
-            }, child: Text("Add Music"))
+                  AddNewMusic()));
+            }, child: Text("Add Music")),
+
+
           ]
       ),
     );

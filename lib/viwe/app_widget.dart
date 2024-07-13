@@ -1,30 +1,31 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/controller/app_controller/app_cubit.dart';
-import 'package:xmusic/controller/aud/audio_cubit.dart';
 import 'package:xmusic/controller/localStore/local_store.dart';
-import 'package:xmusic/controller/user_controller/user_cubit.dart';
-import 'package:xmusic/viwe/pages/auth/register_page.dart';
-import 'package:xmusic/viwe/pages/home/home_page.dart';
+import 'package:xmusic/viwe/pages/bottom_bar.dart';
 
-import '../controller/audio_state/audio_cubit.dart';
+import '../controller/providers.dart';
 
 
-class AppWidget extends StatefulWidget {
+class AppWidget extends ConsumerStatefulWidget {
   const AppWidget({super.key});
 
   @override
-  State<AppWidget> createState() => _AppWidgetState();
+  ConsumerState<AppWidget> createState() => _AppWidgetState();
 }
 
-class _AppWidgetState extends State<AppWidget> {
+class _AppWidgetState extends ConsumerState<AppWidget> {
 
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(audioProvider.notifier).fetchMusic();
+      ref.read(appProvider.notifier).getMode();
+      ref.read(userProvider.notifier).getUser();
+    //  ref.read(audioProvider.notifier).getArtist();
+    });
     AwesomeNotifications().isNotificationAllowed().then((isAllowed){
       if(!isAllowed){
         AwesomeNotifications().requestPermissionToSendNotifications();
@@ -42,14 +43,7 @@ class _AppWidgetState extends State<AppWidget> {
         builder: (context, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: MultiBlocProvider(
-              providers: [
-              BlocProvider(create: (_)=>AudioCubit()),
-                BlocProvider(create: (_)=>AppCubit()),
-                BlocProvider(create: (_)=>UserCubit()),
-              ],
-              child: LocaleStore.getId()==null ? HomePage() : HomePage(),
-            ),
+            home: LocaleStore.getId()==null ? BottomBar() : BottomBar(),
           );
         }
     );

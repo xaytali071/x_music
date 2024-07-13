@@ -1,11 +1,7 @@
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/controller/user_controller/user_cubit.dart';
-import 'package:xmusic/controller/user_controller/user_state.dart';
 import 'package:xmusic/viwe/components/style.dart';
 
 class AvatarImage extends StatelessWidget {

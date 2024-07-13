@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/controller/app_controller/app_cubit.dart';
 import 'package:xmusic/controller/app_controller/app_state.dart';
@@ -11,21 +11,21 @@ import 'package:xmusic/viwe/pages/home/search_page.dart';
 
 import '../../controller/audio_state/audio_cubit.dart';
 import '../../controller/audio_state/audio_state.dart';
+import '../../controller/providers.dart';
 
-class TabWidget extends StatelessWidget {
+class TabWidget extends ConsumerWidget {
   const TabWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    String path="";
-    return BlocBuilder<AppCubit, AppState>(
-      builder: (context, state) {
-        context.read<AppCubit>().getMode();
+  Widget build(BuildContext context,ref) {
+    AppState watch=ref.watch(appProvider);
+    final event=ref.read(appProvider.notifier);
+
         return Container(
           width: 150.w,
           height: 30.h,
           decoration: BoxDecoration(
-            color: state.darkMode ? Style.whiteColor50 : Style.blackColor17,
+            color: watch.darkMode ? Style.whiteColor50 : Style.blackColor17,
             borderRadius: BorderRadius.circular(16.r),
           ),
           child: Row(
@@ -34,27 +34,22 @@ class TabWidget extends StatelessWidget {
                 width: 80.w,
                 height: 30.h,
                 decoration: BoxDecoration(
-                  color: state.darkMode ? Style.whiteColor50 : Style.blackColor17,
+                  color: watch.darkMode ? Style.whiteColor50 : Style.blackColor17,
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child:  Center(
-                    child: Text("Network",style: Style.normalText(color: state.darkMode ? Style.whiteColor : Style.blackColor50),)
+                    child: Text("Network",style: Style.normalText(color: watch.darkMode ? Style.whiteColor : Style.blackColor50),)
                 ),
               ),
               10.horizontalSpace,
-              BlocBuilder<AudioCubit, AudioState>(
-  builder: (context, state) {
-    return Center(
-                  child: GestureDetector(
-                      onTap: (){},
-                      child:  Text("Search",style: Style.normalText(color: state.darkMode ? Style.whiteColor50 : Style.blackColor50)))
-              );
-  },
-)
+              Center(
+                            child: GestureDetector(
+                                onTap: (){},
+                                child:  Text("Search",style: Style.normalText(color: watch.darkMode ? Style.whiteColor50 : Style.blackColor50)))
+                        )
             ],
           ),
         );
-      },
-    );
+
   }
 }

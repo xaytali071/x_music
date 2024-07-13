@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -16,8 +16,8 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../localStore/local_store.dart';
 import 'audio_state.dart';
 
-class AudioCubit extends Cubit<AudioState> {
-  AudioCubit() : super(AudioState());
+class AudioNotifire extends StateNotifier<AudioState> {
+  AudioNotifire() : super( AudioState());
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final ImagePicker image = ImagePicker();
   final player = AudioPlayer();
@@ -39,7 +39,12 @@ class AudioCubit extends Cubit<AudioState> {
   }
 
   getAudio(String url) {
-    player.setUrl(url);
+   // player.setUrl(url);
+    player.setAudioSource(AudioSource.uri(Uri.parse(url)));
+  }
+
+  selectMusic({required int index}){
+    state=state.copyWith(selectIndex:index );
   }
 
   getLocaleMusic(VoidCallback onSuccess) async {
@@ -47,7 +52,7 @@ class AudioCubit extends Cubit<AudioState> {
       type: FileType.custom,
       allowedExtensions: ['mp3', "oog", "ma4", "waw"],
     );
-    emit(state.copyWith(localAudioPath: audioPath?.files.single.path ?? ""));
+    state=(state.copyWith(localAudioPath: audioPath?.files.single.path ?? ""));
     // localPath=audioPath?.files.single.path ?? "";
     onSuccess.call();
   }
@@ -60,9 +65,12 @@ class AudioCubit extends Cubit<AudioState> {
     player.seekToPrevious();
   }
 
-  play() {
-    emit(state.copyWith(isPlay: state.isPlay = !state.isPlay));
+  play(){
+    bool play=state.isPlay;
+    play=play=!play;
+    state=state.copyWith(isPlay: play);
   }
+
 
   pause() {
     player.pause();
@@ -74,17 +82,17 @@ class AudioCubit extends Cubit<AudioState> {
 
   seek(Duration duration) {
     player.seek(duration);
-    // emit(state.copyWith(seek: duration));
+    // state=(state.copyWith(seek: duration));
   }
 
   sielend() {
-    emit(state.copyWith(isSilent: state.isSilent = !state.isSilent));
+    state=(state.copyWith(isSilent: state.isSilent !=state.isSilent));
     state.isSilent ? player.setVolume(0) : player.setVolume(1);
   }
 
   setSpeed({required double speed}) {
     player.setSpeed(speed);
-    emit(state.copyWith(speed: speed));
+    state=(state.copyWith(speed: speed));
     print(state.speed);
   }
 
@@ -95,50 +103,51 @@ class AudioCubit extends Cubit<AudioState> {
   nextMusic(
     MusicModel music,
   ) {
-    emit(state.copyWith(isPlay: true));
-    emit(state.copyWith(music: music));
+    state=(state.copyWith(isPlay: true));
+    state=(state.copyWith(music: music));
   }
 
   pervous(
     MusicModel music,
   ) {
-    emit(state.copyWith(isPlay: true));
-    emit(state.copyWith(music: music));
+    state=(state.copyWith(isPlay: true));
+    state=(state.copyWith(music: music));
   }
 
-  getMusic() async {
-    emit(state.copyWith(isLoading: true));
-    var res = await firestore.collection("music1").get();
-    list11.clear();
-    for (var element in res.docs) {
-      list11.add(MusicModel.fromJson(
-        data: element.data(),
-        authorData: await getArtistWithid(element.data()["artistId"]),
-        id: element.id
-      ));
-    }
-    emit(state.copyWith(listOfMusic: list11));
-    emit(state.copyWith(isLoading: false));
-  }
+  // getMusic() async {
+  //   state=(state.copyWith(isLoading: true));
+  //   var res = await firestore.collection("music").get();
+  //   list11.clear();
+  //   for (var element in res.docs) {
+  //     list11.add(MusicModel.fromJson(
+  //       data: element.data(),
+  //       authorData: await getArtistWithid(element.data()["artistId"]),
+  //       id: element.id, audUrl: await getAudioUrl(element.data()["track"]) ?? "",
+  //     ));
+  //   }
+  //   state=(state.copyWith(listOfMusic: list11));
+  //   state=(state.copyWith(isLoading: false));
+  // }
 
   fechMusic({required int page}) async {
-   // emit(state.copyWith(isLoading: true));
-    var res = await firestore.collection("music$page").get();
+   // state=(state.copyWith(isLoading: true));
+    var res = await firestore.collection("music").get();
 
   //  list.clear();
     for (var element in res.docs) {
       list11.add(MusicModel.fromJson(
           data: element.data(),
+          audUrl: await getAudioUrl(element.data()["track"]) ?? "",
           authorData: await getArtistWithid(element.data()["artistId"]),
           id: element.id
       ));
     }
-    emit(state.copyWith(listOfMusic: list11));
-    emit(state.copyWith(isLoading: false));
+   // state=(state.copyWith(listOfMusic: list11));
+    state=(state.copyWith(isLoading: false));
   }
 
   onMode() {
-    emit(state.copyWith(darkMode: LocaleStore.getMode()));
+    state=(state.copyWith(darkMode: LocaleStore.getMode()));
   }
 
   getImageGallery(VoidCallback onSuccess) async {
@@ -148,21 +157,21 @@ class AudioCubit extends Cubit<AudioState> {
       if (value != null) {
         CroppedFile? cropperImage =
             await ImageCropper().cropImage(sourcePath: value.path);
-        emit(state.copyWith(imagePath: cropperImage?.path));
+        state=(state.copyWith(imagePath: cropperImage?.path ?? ""));
         onSuccess();
       }
     });
   }
 
   addNewAuthor({required String name, required String imagePath}) {
-    emit(state.copyWith(isLoading: true));
+    state=(state.copyWith(isLoading: true));
     createImageUrl(
         imagePath: imagePath,
         onSuccess: () {
           firestore.collection("artist").add(
               AuthorModel(name: name, rating: 0, image: imageUrll).toJson());
         });
-    emit(state.copyWith(isLoading: false));
+    state=(state.copyWith(isLoading: false));
   }
 
   createImageUrl({required String imagePath, VoidCallback? onSuccess}) async {
@@ -173,19 +182,19 @@ class AudioCubit extends Cubit<AudioState> {
 
     String imageUrl = await storageRef.getDownloadURL();
     imageUrll = imageUrl;
-    emit(state.copyWith(imageUrl: imageUrl));
+    state=(state.copyWith(imageUrl: imageUrl));
     onSuccess?.call();
   }
 
   getAuthor() async {
-    emit(state.copyWith(isLoading: true));
+    state=(state.copyWith(isLoading: true));
     List<AuthorModel> list = [];
     var res = await firestore.collection("artist").get();
     list.clear();
     for (var element in res.docs) {
       list.add(AuthorModel.fromJson(data: element.data(), id: element.id));
     }
-    emit(state.copyWith(isLoading: false, listOfAuthor: list));
+    state=(state.copyWith(isLoading: false, listOfAuthor: list));
   }
 
   addNewAudio(
@@ -195,8 +204,8 @@ class AudioCubit extends Cubit<AudioState> {
         required String page,
         required String artistName,
       required VoidCallback? onSuccess}) async {
-    emit(state.copyWith(isLoading: true));
-    firestore.collection("music$page").add(MusicModel(
+    state=(state.copyWith(isLoading: true));
+    firestore.collection("music").add(MusicModel(
             trackUrl: trackUrl,
             trackName: trackName,
             artistId: artistId,
@@ -204,45 +213,88 @@ class AudioCubit extends Cubit<AudioState> {
             rating: 0)
         .toJson());
     onSuccess?.call();
-    emit(state.copyWith(isLoading: false));
+    state=(state.copyWith(isLoading: false));
   }
 
   getArtist() async {
     List<AuthorModel> list=[];
-    emit(state.copyWith(isLoading: true));
+    state=(state.copyWith(isLoading: true));
     var res=await firestore.collection("artist").get();
     for(var e in res.docs){
       list.add(AuthorModel.fromJson(data: e.data(),id: e.id));
     }
-    emit(state.copyWith(listOfAuthor: list,isLoading: false));
+    state=(state.copyWith(listOfAuthor: list,isLoading: false));
   }
 
 
 
   Future<String?> getAudioUrl(String videoUrl) async {
-    emit(state.copyWith(isLoading: true));
+   // state=(state.copyWith(isLoading: true));
     var youtube = YoutubeExplode();
     try {
       var video = await youtube.videos.get(videoUrl);
       var manifest = await youtube.videos.streamsClient.getManifest(video.id);
       var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
-      emit(state.copyWith(audio: audioStreamInfo.url.toString()));
-      emit(state.copyWith(isLoading: true));
+      state=(state.copyWith(audio: audioStreamInfo.url.toString()));
+     // state=(state.copyWith(isLoading: true));
       return audioStreamInfo.url.toString();
     } catch (e) {
       print("Error: $e");
-      emit(state.copyWith(isLoading: false));
+      state=(state.copyWith(isLoading: false));
       return null;
     } finally {
-      emit(state.copyWith(isLoading: false));
+      state=(state.copyWith(isLoading: false));
       youtube.close();
     }
   }
 
   getArtistWithid(String id) async {
-    emit(state.copyWith(isLoading: true));
+    state=(state.copyWith(isLoading: true));
     var res = await firestore.collection("artist").doc(id).get();
     AuthorModel artist = AuthorModel.fromJson(data: res.data());
     return artist;
+  }
+
+
+
+
+  Future<void> fetchMusic() async {
+    if (state.isLoading || !state.hasMoreData) return;
+
+    state = state.copyWith(isLoading: true);
+
+    Query query = FirebaseFirestore.instance.collection('music')
+        .orderBy('trackName')
+        .limit(5);
+
+    if (state.lastDocument != null) {
+      query = query.startAfterDocument(state.lastDocument!);
+    }
+
+    final QuerySnapshot snapshot = await query.get();
+
+    if (snapshot.docs.isEmpty) {
+      state = state.copyWith(hasMoreData: false);
+    } else {
+      List<MusicModel> newMusics = snapshot.docs.map((doc)  {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        AuthorModel? authorData;
+        if (data['artistData'] != null) {
+          authorData =  data['artistData'];
+        }
+        return MusicModel.fromJson(
+          data: data,
+          authorData: authorData,
+          id: doc.id,
+          audUrl:  data["track"],
+        );
+      }).toList();
+      state = state.copyWith(
+        listOfMusic: [...state.listOfMusic, ...newMusics],
+        lastDocument: snapshot.docs.last,
+      );
+    }
+
+    state = state.copyWith(isLoading: false);
   }
 }

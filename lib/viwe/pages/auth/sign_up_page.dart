@@ -1,14 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/viwe/components/avatar_botton.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
 import 'package:xmusic/viwe/components/keyboard_dissimer.dart';
-
-import '../../../controller/app_controller/app_cubit.dart';
-import '../../../controller/audio_state/audio_cubit.dart';
-import '../../../controller/user_controller/user_cubit.dart';
+import '../../../controller/providers.dart';
 import '../../../controller/user_controller/user_state.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_form_field.dart';
@@ -16,14 +13,14 @@ import '../../components/mini_shadow_button.dart';
 import '../../components/style.dart';
 import '../home/home_page.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  ConsumerState<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends ConsumerState<SignUpPage> {
   TextEditingController password2 = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController name = TextEditingController();
@@ -31,14 +28,14 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserState watch=ref.watch(userProvider);
+    final event=ref.read(userProvider.notifier);
     return KeyboardDissimer(
       child: BackGroundWidget(
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: BlocBuilder<UserCubit, UserState>(
-              builder: (context, state) {
-                return Column(
+            child: Column(
                   children: [
                     50.verticalSpace,
                     Text(
@@ -54,7 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       hint: "Fullname",
                       controller: name,
                       onChanged: (s) {
-                        context.read<UserCubit>().changeName(name.text.isEmpty);
+                        event.changeName(name.text.isEmpty);
                       },
                       perfix: Icon(
                         Icons.person,
@@ -66,8 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       hint: "Email",
                       controller: email,
                       onChanged: (s) {
-                        context
-                            .read<UserCubit>()
+                        event
                             .changeEmail(email.text.isEmpty);
                       },
                       perfix: Icon(
@@ -78,10 +74,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     30.verticalSpace,
                     CustomTextFormField(
                       hint: "Password",
-                      obscure: state.isHide,
+                      obscure: watch.isHide,
                       controller: password,
                       onChanged: (s) {
-                        context.read<UserCubit>().checkPassword(s);
+                        event.checkPassword(s);
                       },
                       perfix: const Icon(
                         Icons.lock,
@@ -89,9 +85,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       sufix: GestureDetector(
                           onTap: () {
-                            context.read<UserCubit>().hidePassword();
+                            event.hidePassword();
                           },
-                          child: state.isHide
+                          child: watch.isHide
                               ? const Icon(
                                   Icons.visibility,
                                   color: Style.darkPrimaryColor,
@@ -104,11 +100,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     30.verticalSpace,
                     CustomTextFormField(
                       hint: "Confirm password",
-                      obscure: state.isHide,
+                      obscure: watch.isHide,
                       controller: password2,
                       onChanged: (s) {
-                        context
-                            .read<UserCubit>()
+                        event
                             .checkConfirmPassword(s, password.text);
                       },
                       perfix: const Icon(
@@ -117,9 +112,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       sufix: GestureDetector(
                           onTap: () {
-                            context.read<UserCubit>().hidePassword();
+                            event.hidePassword();
                           },
-                          child: state.isHide
+                          child: watch.isHide
                               ? const Icon(
                                   Icons.visibility,
                                   color: Style.darkPrimaryColor,
@@ -130,28 +125,28 @@ class _SignUpPageState extends State<SignUpPage> {
                                 )),
                     ),
                     10.verticalSpace,
-                    (state.errorText?.isEmpty ?? false)
+                    (watch.errorText?.isEmpty ?? false)
                         ? SizedBox.shrink()
                         : Text(
-                            state.errorText ?? "",
+                            watch.errorText ?? "",
                             style: Style.normalText(color: Style.redColor),
                           ),
                     70.verticalSpace,
-                    state.check
+                    watch.check
                         ? CustomButton(
                             text: "Next",
                             onTap: () {
-                              (state.imagePath?.isNotEmpty ?? false)
-                                  ? context.read<UserCubit>().createImageUrl(
-                                      imagePath: state.imagePath ?? "",
+                              (watch.imagePath?.isNotEmpty ?? false)
+                                  ? event.createImageUrl(
+                                      imagePath: watch.imagePath ?? "",
                                       onSuccess: () {
-                                        context.read<UserCubit>().createUser(
+                                        event.createUser(
                                             name: name.text,
                                             password: password.text,
                                             email: email.text,
-                                            avatar: state.imageUrl);
+                                            avatar: watch.imageUrl);
                                       })
-                                  : context.read<UserCubit>().createUser(
+                                  : event.createUser(
                                       name: name.text,
                                       password: password.text,
                                       email: email.text,
@@ -159,26 +154,14 @@ class _SignUpPageState extends State<SignUpPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => MultiBlocProvider(
-                                            providers: [
-                                              BlocProvider(
-                                                create: (context) => AppCubit(),
-                                              ),
-                                              BlocProvider(
-                                                create: (context) =>
-                                                    AudioCubit(),
-                                              ),
-                                            ],
-                                            child: HomePage(),
-                                          )));
+                                      builder: (_) => HomePage()));
                             },
                             color: Style.darkPrimaryColor,
                           )
-                        : state.isLoading ? CircularProgressIndicator()  : CustomButton(
+                        : watch.isLoading ? CircularProgressIndicator()  : CustomButton(
                             text: "Next",
                             onTap: () {
-                              context
-                                  .read<UserCubit>()
+                              event
                                   .errorText("Name or email or password empty");
                             },
                             color: Style.primaryColor.withOpacity(0.5),
@@ -195,22 +178,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         MiniShadowButton(
                           image: "assets/Google.png",
                           onTap: () {
-                            context.read<UserCubit>().loginGoogle(() {
+                            event.loginGoogle(() {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => MultiBlocProvider(
-                                            providers: [
-                                              BlocProvider(
-                                                create: (context) => AppCubit(),
-                                              ),
-                                              BlocProvider(
-                                                create: (context) =>
-                                                    AudioCubit(),
-                                              ),
-                                            ],
-                                            child: HomePage(),
-                                          )));
+                                      builder: (_) => HomePage()));
                             });
                           },
                         ),
@@ -245,9 +217,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     30.verticalSpace,
                   ],
-                );
-              },
-            ),
+                )
+
           ),
         ),
       ),

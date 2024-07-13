@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,8 +14,8 @@ import 'package:xmusic/controller/user_controller/user_state.dart';
 import '../../model/user_model.dart';
 import '../localStore/local_store.dart';
 
-class UserCubit extends Cubit<UserState> {
-  UserCubit() : super(UserState());
+class UserNotifire extends StateNotifier<UserState> {
+  UserNotifire() : super(UserState());
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final ImagePicker image = ImagePicker();
 
@@ -32,16 +32,16 @@ class UserCubit extends Cubit<UserState> {
         return false;
       }
     } catch (e) {
-      emit(state.copyWith(isLoading: false));
+      state = (state.copyWith(isLoading: false));
       return false;
     }
   }
 
   sendSms(String phone, VoidCallback codeSend) async {
-    emit(state.copyWith(isLoading: true, errorText: null));
+    state = (state.copyWith(isLoading: true, errorText: ""));
 
     if (await checkPhone(phone)) {
-      emit(state.copyWith(
+      state = (state.copyWith(
           errorText: "Bu raqamga avval hisob ochilgan", isLoading: false));
     } else {
       await FirebaseAuth.instance.verifyPhoneNumber(
@@ -57,9 +57,9 @@ class UserCubit extends Cubit<UserState> {
           }
         },
         codeSent: (String verificationId, int? resendToken) {
-          emit(state.copyWith(phone: phone, isLoading: false));
+          state = (state.copyWith(phone: phone, isLoading: false));
           codeSend();
-          emit(state.copyWith(verificationId: verificationId));
+          state = (state.copyWith(verificationId: verificationId));
         },
         codeAutoRetrievalTimeout: (String verificationId) {},
       );
@@ -72,17 +72,16 @@ class UserCubit extends Cubit<UserState> {
         .doc(await LocaleStore.getId())
         .get();
     UserModel newModel = UserModel.fromJson(data: res.data());
-    emit(state.copyWith(userModel: newModel));
+    state = (state.copyWith(userModel: newModel));
   }
 
-
   checkCode(String code, VoidCallback onSuccess) async {
-    emit(state.copyWith(isLoading: true));
+    state = (state.copyWith(isLoading: true));
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: state.verificationId, smsCode: code);
 
-      emit(state.copyWith(isLoading: false));
+      state = (state.copyWith(isLoading: false));
 
       onSuccess();
     } catch (e) {
@@ -92,15 +91,20 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
-  createUser({required String name,required String password,required String email,required String? avatar,VoidCallback? onSuccess}) async {
+  createUser(
+      {required String name,
+      required String password,
+      required String email,
+      required String? avatar,
+      VoidCallback? onSuccess}) async {
     firestore
         .collection("users")
         .add(UserModel(
-      name: name,
-      password: password,
-      email: email,
-      avatar: avatar,
-    ).toJson())
+          name: name,
+          password: password,
+          email: email,
+          avatar: avatar,
+        ).toJson())
         .then((value) async {
       await LocaleStore.setId(value.id);
 
@@ -108,19 +112,19 @@ class UserCubit extends Cubit<UserState> {
     });
   }
 
-  createImageUrl({required String imagePath,VoidCallback? onSuccess}) async {
+  createImageUrl({required String imagePath, VoidCallback? onSuccess}) async {
     final storageRef = FirebaseStorage.instance
         .ref()
         .child("musicImage/${DateTime.now().toString()}");
     await storageRef.putFile(File(imagePath ?? ""));
 
     String imageUrl = await storageRef.getDownloadURL();
-    emit(state.copyWith(imageUrl: imageUrl));
+    state = (state.copyWith(imageUrl: imageUrl));
     onSuccess?.call();
   }
 
   loginGoogle(VoidCallback onSuccess) async {
-    emit(state.copyWith(isGoogleLoading: true));
+    state = (state.copyWith(isGoogleLoading: true));
     GoogleSignIn googleSignIn = GoogleSignIn();
     GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser?.authentication != null) {
@@ -131,18 +135,18 @@ class UserCubit extends Cubit<UserState> {
       );
 
       final userObj =
-      await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithCredential(credential);
       debugPrint("${userObj.additionalUserInfo?.isNewUser}");
       if (userObj.additionalUserInfo?.isNewUser ?? true) {
         // sing in
         firestore
             .collection("users")
             .add(UserModel(
-          name: userObj.user?.displayName ?? "",
-          password: userObj.user?.uid ?? "",
-          email: userObj.user?.email ?? "",
-          avatar: userObj.user?.photoURL ?? "",
-        ).toJson())
+              name: userObj.user?.displayName ?? "",
+              password: userObj.user?.uid ?? "",
+              email: userObj.user?.email ?? "",
+              avatar: userObj.user?.photoURL ?? "",
+            ).toJson())
             .then((value) async {
           await LocaleStore.setId(value.id);
           onSuccess();
@@ -162,11 +166,11 @@ class UserCubit extends Cubit<UserState> {
       }
     }
 
-    emit(state.copyWith(isGoogleLoading: false));
+    state = (state.copyWith(isGoogleLoading: false));
   }
 
   loginFacebook(VoidCallback onSuccess) async {
-    emit(state.copyWith(isFacebookLoading: true));
+    state = (state.copyWith(isFacebookLoading: true));
     final fb = FacebookLogin();
     final user = await fb.logIn(permissions: [
       FacebookPermission.email,
@@ -174,20 +178,20 @@ class UserCubit extends Cubit<UserState> {
     ]);
     if (user.status == FacebookLoginStatus.success) {
       final OAuthCredential credential =
-      FacebookAuthProvider.credential(user.accessToken?.token ?? "");
+          FacebookAuthProvider.credential(user.accessToken?.token ?? "");
 
       final userObj =
-      await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithCredential(credential);
       if (userObj.additionalUserInfo?.isNewUser ?? true) {
         // sing in
         firestore
             .collection("users")
             .add(UserModel(
-          name: userObj.user?.displayName ?? "",
-          password: userObj.user?.uid ?? "",
-          email: userObj.user?.email ?? "",
-          avatar: userObj.user?.photoURL ?? "",
-        ).toJson())
+              name: userObj.user?.displayName ?? "",
+              password: userObj.user?.uid ?? "",
+              email: userObj.user?.email ?? "",
+              avatar: userObj.user?.photoURL ?? "",
+            ).toJson())
             .then((value) async {
           await LocaleStore.setId(value.id);
           onSuccess();
@@ -206,7 +210,7 @@ class UserCubit extends Cubit<UserState> {
       }
     }
 
-    emit(state.copyWith(isFacebookLoading: false));
+    state = (state.copyWith(isFacebookLoading: false));
   }
 
   logOut(VoidCallback onSuccess) async {
@@ -229,7 +233,7 @@ class UserCubit extends Cubit<UserState> {
       );
       onSuccess();
 
-      emit(state.copyWith(userModel: userModel));
+      state = (state.copyWith(userModel: userModel));
     }
   }
 
@@ -237,15 +241,18 @@ class UserCubit extends Cubit<UserState> {
     await image.pickImage(source: ImageSource.gallery).then((value) async {
       if (value != null) {
         CroppedFile? cropperImage =
-        await ImageCropper().cropImage(sourcePath: value.path);
-        emit(state.copyWith(imagePath: cropperImage?.path));
+            await ImageCropper().cropImage(sourcePath: value.path);
+        state = (state.copyWith(imagePath: cropperImage?.path ?? ""));
         onSuccess();
       }
     });
   }
 
-  login({required String email,required String password, VoidCallback? onSuccess}) async {
-   emit(state.copyWith(errorText: "",isLoading: true));
+  login(
+      {required String email,
+      required String password,
+      VoidCallback? onSuccess}) async {
+    state = (state.copyWith(errorText: "", isLoading: true));
     try {
       var res = await firestore
           .collection("users")
@@ -254,14 +261,18 @@ class UserCubit extends Cubit<UserState> {
       if (res.docs.first["password"] == password) {
         LocaleStore.setId(res.docs.first.id);
         onSuccess?.call();
-       emit(state.copyWith(isLoading: false));
-
+        state = (state.copyWith(isLoading: false));
       } else {
-        emit(state.copyWith(errorText:"Password xatto bolishi mumkin yoki bunaqa nomer bn sign up qilinmagan" ,isLoading: false));
-
+        state = (state.copyWith(
+            errorText:
+                "Password xatto bolishi mumkin yoki bunaqa nomer bn sign up qilinmagan",
+            isLoading: false));
       }
     } catch (e) {
-      emit(state.copyWith(errorText: "Password xatto bolishi mumkin yoki bunaqa nomer bn sign up qilinmagan",isLoading: false));
+      state = (state.copyWith(
+          errorText:
+              "Password xatto bolishi mumkin yoki bunaqa nomer bn sign up qilinmagan",
+          isLoading: false));
     }
   }
 
@@ -282,55 +293,65 @@ class UserCubit extends Cubit<UserState> {
   }
 
   hidePassword() {
-    emit(state.copyWith(isHide: state.isHide=!state.isHide));
+    state = (state.copyWith(isHide: state.isHide !=state.isHide));
   }
 
   changeName(bool isEmpty) {
-    state.name=isEmpty;
-    if (state.email == false && state.name == false && state.pass == false && state.checkConfirm==false) {
-      emit(state.copyWith(check: true));
-    }
-    else {
-      emit(state.copyWith(check: false));
+    state.name == isEmpty;
+    if (state.email == false &&
+        state.name == false &&
+        state.pass == false &&
+        state.checkConfirm == false) {
+      state = (state.copyWith(check: true));
+    } else {
+      state = (state.copyWith(check: false));
     }
   }
 
-  checkConfirmPassword(String password,String password2) {
-    state.checkConfirm=password!=password2;
+  checkConfirmPassword(String password, String password2) {
+ //   state.checkConfirm = password == password2;
     print(state.checkConfirm);
-    if(state.email == false && state.name == false && state.pass == false && state.checkConfirm==false) {
-      emit(state.copyWith(check: true,errorText: ""));
-    }
-    else{
-      emit(state.copyWith(check: false,errorText: "Passwords do not match"));
+    if (state.email == false &&
+        state.name == false &&
+        state.pass == false &&
+        state.checkConfirm == false) {
+      state = (state.copyWith(check: true, errorText: ""));
+    } else {
+      state =
+          (state.copyWith(check: false, errorText: "Passwords do not match"));
     }
   }
 
-  checkPassword(String password){
-    state.pass=password.length<8;
+  checkPassword(String password) {
+    state.pass == password.length < 8;
     print(state.pass);
-     if(state.email == false && state.name == false && state.pass == false && state.checkConfirm==false){
-    emit(state.copyWith(check: true,));
-    }
-     else if(password.length<8){
-      emit(state.copyWith(check: false,errorText: "Inviled password"));
-    }
-    else{
-      emit(state.copyWith(check: false,errorText: ""));
+    if (state.email == false &&
+        state.name == false &&
+        state.pass == false &&
+        state.checkConfirm == false) {
+      state = (state.copyWith(
+        check: true,
+      ));
+    } else if (password.length < 8) {
+      state = (state.copyWith(check: false, errorText: "Inviled password"));
+    } else {
+      state = (state.copyWith(check: false, errorText: ""));
     }
   }
 
   changeEmail(bool isEmpty) {
-    state.email=isEmpty;
-    if (state.email == false && state.name == false && state.pass == false && state.checkConfirm==false) {
-      emit(state.copyWith(check: true));
-    }
-    else {
-      emit(state.copyWith(check: false));
+    state.email == isEmpty;
+    if (state.email == false &&
+        state.name == false &&
+        state.pass == false &&
+        state.checkConfirm == false) {
+      state = (state.copyWith(check: true));
+    } else {
+      state = (state.copyWith(check: false));
     }
   }
 
-  errorText(String text){
-    emit(state.copyWith(errorText:text ));
+  errorText(String text) {
+    state = (state.copyWith(errorText: text));
   }
 }

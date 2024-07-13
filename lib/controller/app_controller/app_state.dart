@@ -1,13 +1,10 @@
-class AppState{
-  bool darkMode;
-  int selectIndex;
-  AppState({this.darkMode=false,this.selectIndex=0});
+import 'package:freezed_annotation/freezed_annotation.dart';
+part 'app_state.freezed.dart';
 
-  AppState copyWith({
-    bool? darkMode,
-    int? selectIndex,
-})=>AppState(
-    darkMode: darkMode ?? this.darkMode,
-    selectIndex: selectIndex ?? this.selectIndex,
-  );
+@freezed
+class AppState with _$AppState{
+  const factory AppState({
+    @Default(false) bool darkMode,
+    @Default(0) int selectIndex,
+  })=_AppState;
 }

@@ -1,6 +1,6 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/model/music_model.dart';
 import 'package:xmusic/viwe/components/custom_network_image.dart';
@@ -8,10 +8,12 @@ import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/pages/home/home_page.dart';
 import '../../../controller/audio_state/audio_cubit.dart';
 import '../../../controller/audio_state/audio_state.dart';
+import '../../../controller/providers.dart';
+import '../bottom_bar.dart';
 
-class InMusicPage extends StatefulWidget {
+class InMusicPage extends ConsumerStatefulWidget {
   final List<MusicModel>? music;
-  final BuildContext context;
+ // final BuildContext context;
 
   final int index;
 
@@ -19,17 +21,19 @@ class InMusicPage extends StatefulWidget {
     super.key,
     required this.music,
     required this.index,
-    required this.context,
+    //required this.context,
   });
 
   @override
-  State<InMusicPage> createState() => _InMusicPageState();
+  ConsumerState<InMusicPage> createState() => _InMusicPageState();
 }
 
-class _InMusicPageState extends State<InMusicPage> {
+class _InMusicPageState extends ConsumerState<InMusicPage> {
   @override
   void initState() {
-    context.read<AudioCubit>().onMode();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(audioProvider.notifier).onMode();
+    });
     super.initState();
   }
 
@@ -37,10 +41,10 @@ class _InMusicPageState extends State<InMusicPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AudioCubit, AudioState>(
-  builder: (context, state) {
+    AudioState watch = ref.watch(audioProvider);
+    final event = ref.read(audioProvider.notifier);
     return Scaffold(
-      backgroundColor: state.darkMode ? Style.blackColor : Style.whiteColor,
+      backgroundColor: watch.darkMode ? Style.blackColor : Style.whiteColor,
       body:Padding(
              padding: EdgeInsets.symmetric(horizontal: 20.w),
                child: Column(
@@ -57,7 +61,7 @@ class _InMusicPageState extends State<InMusicPage> {
                        child: Text(
                          widget.music?[selIndex].artistData?.name ?? "",
                          style: Style.normalText(
-                             color: state.darkMode
+                             color: watch.darkMode
                                  ? Style.whiteColor
                                  : Style.blackColor),
                        ),
@@ -66,20 +70,19 @@ class _InMusicPageState extends State<InMusicPage> {
                        child: Text(
                          widget.music?[selIndex].trackName ?? "",
                          style: Style.miniText(
-                             color: state.darkMode
+                             color: watch.darkMode
                                  ? Style.whiteColor50
                                  : Style.blackColor),
                        ),
                      ),
                      20.verticalSpace,
                      StreamBuilder(
-                         stream: widget.context
-                             .read<AudioCubit>()
+                         stream: event
                              .player
                              .positionStream,
                          builder: (context, snapshot) {
-                           if(snapshot.data==widget.context.read<AudioCubit>().player.duration && selIndex!=widget.music!.length-1){
-                             widget.context.read<AudioCubit>()
+                           if(snapshot.data==event.player.duration && selIndex!=widget.music!.length-1){
+                             event
                                ..pause()
                                ..nextMusic(
                                    widget.music![++selIndex])..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
@@ -88,10 +91,9 @@ class _InMusicPageState extends State<InMusicPage> {
                            return ProgressBar(
                              progress: snapshot.data ??
                                  const Duration(seconds: 0),
-                             total: widget.context.read<AudioCubit>().player.duration ?? Duration(seconds: 0),
+                             total: event.player.duration ?? const Duration(seconds: 0),
                              onSeek: (duration) {
-                               widget.context
-                                   .read<AudioCubit>().player.seek(duration);
+                               event.player.seek(duration);
                              },
                            );
                          }),
@@ -101,17 +103,17 @@ class _InMusicPageState extends State<InMusicPage> {
                                MainAxisAlignment.spaceEvenly,
                            children: [
                              IconButton(onPressed: (){
-                               widget.context.read<AudioCubit>().sielend();
-                         }, icon: state.isSilent ? const Icon(Icons.volume_off) : const Icon(Icons.volume_up) ),
+                               event.sielend();
+                         }, icon: watch.isSilent ? const Icon(Icons.volume_off) : const Icon(Icons.volume_up) ),
                              IconButton(
-                                 onPressed: () {
+                                 onPressed: () async {
                                    if (selIndex != 0) {
-                                     widget.context.read<AudioCubit>()
+                                     event
                                        ..pause()
                                        ..pervous(
                                          widget.music![--selIndex],
                                        )
-                                  ..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
+                                  ..getAudio(await event.getAudioUrl( widget.music?[selIndex].trackUrl ?? "") ?? "")..playy();
                                          setState(() {});
                                    }
                                  },
@@ -121,17 +123,15 @@ class _InMusicPageState extends State<InMusicPage> {
                                  )),
                              IconButton(
                                  onPressed: () {
-                                   context.read<AudioCubit>().play();
-                                   state.isPlay
-                                       ? widget.context
-                                           .read<AudioCubit>()
+                                   event.play();
+                                   !watch.isPlay
+                                       ? event
                                            .playy()
-                                       : widget.context
-                                           .read<AudioCubit>()
+                                       : event
                                            .pause();
                                    setState(() {});
                                  },
-                                 icon: state.isPlay
+                                 icon: watch.isPlay
                                      ? const Icon(
                                          Icons.pause,
                                          size: 60,
@@ -141,13 +141,13 @@ class _InMusicPageState extends State<InMusicPage> {
                                          size: 60,
                                        )),
                              IconButton(
-                                 onPressed: () {
+                                 onPressed: () async {
                                    if ((widget.music?.length ?? 0) - 1 !=
                                        selIndex) {
-                                     widget.context.read<AudioCubit>()
+                                     event
                                        ..pause()
                                        ..nextMusic(
-                                           widget.music![++selIndex])..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
+                                           widget.music![++selIndex])..getAudio(await event.getAudioUrl(widget.music?[selIndex].trackUrl ?? "") ?? "")..playy();
                                     setState(() {});
                                    }
                                  },
@@ -156,45 +156,45 @@ class _InMusicPageState extends State<InMusicPage> {
                                    size: 40,
                                  )),
                                DropdownButton(
-                                 value: state.speed,
-                                 dropdownColor: state.darkMode ? Style.whiteColor50 : Style.blackColor50,
-                                 style: Style.miniText(color:state.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                 value: watch.speed,
+                                 dropdownColor: watch.darkMode ? Style.whiteColor50 : Style.blackColor50,
+                                 style: Style.miniText(color:watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
                                  items: [
                                    DropdownMenuItem(
                                      value: 0.5,
                                      child: Text(
                                        "0.5x",
-                                       style:Style.miniText(color:state.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                       style:Style.miniText(color:watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
                                      ),
                                    ),
                                    DropdownMenuItem(
                                      value: 0.75,
                                      child: Text(
                                        "0.7x",
-                                       style:Style.miniText(color: state.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                       style:Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
                                      ),
                                    ),
                                    DropdownMenuItem(
                                      value: 1.0,
                                      child: Text(
                                        "1.0x",
-                                       style:Style.miniText(color: state.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                       style:Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
                                      ),
                                    ),
                                    DropdownMenuItem(
                                      value: 1.5,
                                      child: Text("1.5x",
-                                         style: Style.miniText(color: state.darkMode ? Style.blackColor50 : Style.whiteColor50)),
+                                         style: Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50)),
                                    ),
                                    DropdownMenuItem(
                                      value: 2.0,
                                      child: Text("2x",
-                                         style: Style.miniText(color: state.darkMode ? Style.blackColor50 : Style.whiteColor50)),
+                                         style: Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50)),
                                    )
                                  ],
                                    onChanged: (s) {
                                      if (s != null) {
-                                       widget.context.read<AudioCubit>().setSpeed(speed: s);
+                                       event.setSpeed(speed: s);
                                      }
                                    }
                                ),
@@ -207,8 +207,8 @@ class _InMusicPageState extends State<InMusicPage> {
 
            ),
     );
-        },
-      );
+
+
 
   }
 }
