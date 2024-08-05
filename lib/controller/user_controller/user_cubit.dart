@@ -10,8 +10,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
+import 'package:xmusic/model/coment_model.dart';
 import 'package:xmusic/viwe/components/style.dart';
 
+import '../../model/message_model.dart';
 import '../../model/user_model.dart';
 import '../local_store.dart';
 
@@ -291,6 +293,94 @@ class UserNotifire extends StateNotifier<UserState> {
     });
   }
 
+  sendFeedback({required String title}){
+    state=state.copyWith(isLoading: true);
+    firestore.collection("feedback").add(FeedbackModel(title: title, userId: LocaleStore.getId(),).toJson());
+    state=state.copyWith(isLoading: false);
+  }
+
+  daleteMessage({required String id}){
+    firestore.collection("users").doc(LocaleStore.getId()).collection("messages").doc(id).delete();
+    print("daleted");
+  }
+
+  deleteFile({required String imagUrl}) async {
+    Reference photoRef =await FirebaseStorage.instance.refFromURL(imagUrl);
+    await photoRef.delete().then((value) {
+      print('deleted Successfully');
+    });
+  }
+
+  sendMessageImage({required String userId,
+    required String title,
+    required String image,
+    required String body}) async {
+    state = state.copyWith(isLoading: true);
+    firestore.collection("users").doc(userId).collection("messages").add(
+        MessageModel(
+          //  userId: userId,
+            title: title,
+            time: DateTime.now(),
+            image: image,
+
+            body: body)
+            .toJson());
+    state = state.copyWith(isLoading: false);
+  }
+
+  getMessage() async {
+    state=state.copyWith(isLoading: true);
+    List<MessageModel> list=[];
+    var res=await firestore.collection("users").doc(LocaleStore.getId()).collection("messages").get();
+    int count=0;
+    for(var element in res.docs){
+      list.add(MessageModel.fromJson(element.data(), element.id));
+    }
+    list.sort(((a, b) => b.time!.compareTo(a.time!)));
+
+    for(int i=0;i<list.length;i++){
+      if(list[i].isRead==false){
+        count+=1;
+      }
+      if(list.length>10){
+        daleteMessage(id: list.last.id ?? "");
+        deleteFile(imagUrl: list.last.image ?? "");
+      }
+    }
+
+    state=state.copyWith(isLoading: false,listOfMessage: list,messageCount: count);
+  }
+
+  getMessages4() async {
+    state=state.copyWith(isLoading: true);
+    var res =await firestore
+        .collection("users")
+        .doc(LocaleStore.getId())
+        .collection("messages").snapshots().listen((res){
+      int count=0;
+      List<MessageModel> list=[];
+      for(var element in res.docs){
+        list.add(MessageModel.fromJson(element.data(),element.id));
+        if(element.data()["isRead"]==false){
+          count+=1;
+        }}
+      if(list.length>10){
+        daleteMessage(id: list.last.id ?? "");
+        deleteFile(imagUrl: list.last.image ?? "");
+      }
+      state=state.copyWith(listOfMessage: list,isLoading: false,messageCount: count);
+
+    });
+
+  }
+
+  readMessage({required String messageDocId}) async {
+    await firestore
+        .collection("users")
+        .doc(LocaleStore.getId())
+        .collection("messages").doc(messageDocId).update({"isRead":true});
+  }
+
   login(
       {required String email,
       required String password,
@@ -359,13 +449,6 @@ class UserNotifire extends StateNotifier<UserState> {
       onSuccess.call();
   }
 
-
-  deleteFile({required String imagUrl}) async {
-    Reference photoRef =FirebaseStorage.instance.refFromURL(imagUrl);
-    await photoRef.delete().then((value) {
-      print('deleted Successfully');
-    });
-  }
 
   hidePassword() {
     bool s=state.isHide;

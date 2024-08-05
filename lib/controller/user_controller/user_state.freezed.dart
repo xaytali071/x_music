@@ -31,7 +31,9 @@ mixin _$UserState {
   bool get email => throw _privateConstructorUsedError;
   bool get check => throw _privateConstructorUsedError;
   bool get emptyImage => throw _privateConstructorUsedError;
-  bool get emptyName => throw _privateConstructorUsedError; // bool checkPass,
+  bool get emptyName => throw _privateConstructorUsedError;
+  List<MessageModel> get listOfMessage => throw _privateConstructorUsedError;
+  int get messageCount => throw _privateConstructorUsedError; // bool checkPass,
   bool get checkConfirm => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -61,6 +63,8 @@ abstract class $UserStateCopyWith<$Res> {
       bool check,
       bool emptyImage,
       bool emptyName,
+      List<MessageModel> listOfMessage,
+      int messageCount,
       bool checkConfirm});
 }
 
@@ -93,6 +97,8 @@ class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
     Object? check = null,
     Object? emptyImage = null,
     Object? emptyName = null,
+    Object? listOfMessage = null,
+    Object? messageCount = null,
     Object? checkConfirm = null,
   }) {
     return _then(_value.copyWith(
@@ -160,6 +166,14 @@ class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
           ? _value.emptyName
           : emptyName // ignore: cast_nullable_to_non_nullable
               as bool,
+      listOfMessage: null == listOfMessage
+          ? _value.listOfMessage
+          : listOfMessage // ignore: cast_nullable_to_non_nullable
+              as List<MessageModel>,
+      messageCount: null == messageCount
+          ? _value.messageCount
+          : messageCount // ignore: cast_nullable_to_non_nullable
+              as int,
       checkConfirm: null == checkConfirm
           ? _value.checkConfirm
           : checkConfirm // ignore: cast_nullable_to_non_nullable
@@ -193,6 +207,8 @@ abstract class _$$UserStateImplCopyWith<$Res>
       bool check,
       bool emptyImage,
       bool emptyName,
+      List<MessageModel> listOfMessage,
+      int messageCount,
       bool checkConfirm});
 }
 
@@ -223,6 +239,8 @@ class __$$UserStateImplCopyWithImpl<$Res>
     Object? check = null,
     Object? emptyImage = null,
     Object? emptyName = null,
+    Object? listOfMessage = null,
+    Object? messageCount = null,
     Object? checkConfirm = null,
   }) {
     return _then(_$UserStateImpl(
@@ -290,6 +308,14 @@ class __$$UserStateImplCopyWithImpl<$Res>
           ? _value.emptyName
           : emptyName // ignore: cast_nullable_to_non_nullable
               as bool,
+      listOfMessage: null == listOfMessage
+          ? _value._listOfMessage
+          : listOfMessage // ignore: cast_nullable_to_non_nullable
+              as List<MessageModel>,
+      messageCount: null == messageCount
+          ? _value.messageCount
+          : messageCount // ignore: cast_nullable_to_non_nullable
+              as int,
       checkConfirm: null == checkConfirm
           ? _value.checkConfirm
           : checkConfirm // ignore: cast_nullable_to_non_nullable
@@ -318,7 +344,10 @@ class _$UserStateImpl implements _UserState {
       this.check = false,
       this.emptyImage = false,
       this.emptyName = false,
-      this.checkConfirm = false});
+      final List<MessageModel> listOfMessage = const [],
+      this.messageCount = 0,
+      this.checkConfirm = false})
+      : _listOfMessage = listOfMessage;
 
   @override
   @JsonKey()
@@ -367,6 +396,18 @@ class _$UserStateImpl implements _UserState {
   @override
   @JsonKey()
   final bool emptyName;
+  final List<MessageModel> _listOfMessage;
+  @override
+  @JsonKey()
+  List<MessageModel> get listOfMessage {
+    if (_listOfMessage is EqualUnmodifiableListView) return _listOfMessage;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_listOfMessage);
+  }
+
+  @override
+  @JsonKey()
+  final int messageCount;
 // bool checkPass,
   @override
   @JsonKey()
@@ -374,7 +415,7 @@ class _$UserStateImpl implements _UserState {
 
   @override
   String toString() {
-    return 'UserState(isGoogleLoading: $isGoogleLoading, isFacebookLoading: $isFacebookLoading, isLoading: $isLoading, userModel: $userModel, verificationId: $verificationId, phone: $phone, errorText: $errorText, imageUrl: $imageUrl, imagePath: $imagePath, isHide: $isHide, name: $name, pass: $pass, email: $email, check: $check, emptyImage: $emptyImage, emptyName: $emptyName, checkConfirm: $checkConfirm)';
+    return 'UserState(isGoogleLoading: $isGoogleLoading, isFacebookLoading: $isFacebookLoading, isLoading: $isLoading, userModel: $userModel, verificationId: $verificationId, phone: $phone, errorText: $errorText, imageUrl: $imageUrl, imagePath: $imagePath, isHide: $isHide, name: $name, pass: $pass, email: $email, check: $check, emptyImage: $emptyImage, emptyName: $emptyName, listOfMessage: $listOfMessage, messageCount: $messageCount, checkConfirm: $checkConfirm)';
   }
 
   @override
@@ -408,30 +449,37 @@ class _$UserStateImpl implements _UserState {
                 other.emptyImage == emptyImage) &&
             (identical(other.emptyName, emptyName) ||
                 other.emptyName == emptyName) &&
+            const DeepCollectionEquality()
+                .equals(other._listOfMessage, _listOfMessage) &&
+            (identical(other.messageCount, messageCount) ||
+                other.messageCount == messageCount) &&
             (identical(other.checkConfirm, checkConfirm) ||
                 other.checkConfirm == checkConfirm));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      isGoogleLoading,
-      isFacebookLoading,
-      isLoading,
-      userModel,
-      verificationId,
-      phone,
-      errorText,
-      imageUrl,
-      imagePath,
-      isHide,
-      name,
-      pass,
-      email,
-      check,
-      emptyImage,
-      emptyName,
-      checkConfirm);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        isGoogleLoading,
+        isFacebookLoading,
+        isLoading,
+        userModel,
+        verificationId,
+        phone,
+        errorText,
+        imageUrl,
+        imagePath,
+        isHide,
+        name,
+        pass,
+        email,
+        check,
+        emptyImage,
+        emptyName,
+        const DeepCollectionEquality().hash(_listOfMessage),
+        messageCount,
+        checkConfirm
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -458,6 +506,8 @@ abstract class _UserState implements UserState {
       final bool check,
       final bool emptyImage,
       final bool emptyName,
+      final List<MessageModel> listOfMessage,
+      final int messageCount,
       final bool checkConfirm}) = _$UserStateImpl;
 
   @override
@@ -492,6 +542,10 @@ abstract class _UserState implements UserState {
   bool get emptyImage;
   @override
   bool get emptyName;
+  @override
+  List<MessageModel> get listOfMessage;
+  @override
+  int get messageCount;
   @override // bool checkPass,
   bool get checkConfirm;
   @override

@@ -7,10 +7,12 @@ import 'package:xmusic/viwe/components/button/custom_social_button2.dart';
 import 'package:xmusic/viwe/components/image/avatar_image.dart';
 import 'package:xmusic/viwe/components/button/custom_button.dart';
 import 'package:xmusic/viwe/components/button/custom_social_button.dart';
+import 'package:xmusic/viwe/components/social_media.dart';
 import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/pages/auth/change_password_page.dart';
 import 'package:xmusic/viwe/pages/auth/profile_page.dart';
 import 'package:xmusic/viwe/pages/auth/register_page.dart';
+import 'package:xmusic/viwe/pages/home/feedback_page.dart';
 
 import '../../../controller/providers.dart';
 import '../../components/form_field/custom_text_form_field.dart';
@@ -107,6 +109,10 @@ class _DrawerWidgetState extends ConsumerState<DrawerWidget> {
                   });
                 }),
                 20.verticalSpace,
+                CustomSocialButton(leftIcon: Icon(Icons.chat_bubble), text: "Feedback", onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>FeedBackPage()));
+                }),
+                20.verticalSpace,
                 CustomSocialButton(leftIcon: Icon(Icons.logout), text: "Log out", onTap: (){
                   showDialog(context: context, builder: (_){
                     return Dialog(
@@ -171,13 +177,15 @@ class _DrawerWidgetState extends ConsumerState<DrawerWidget> {
                               })
                             ],
                           ),
-                          20.verticalSpace
+                          20.verticalSpace,
                         ],
 
                       ),
                     );
                   });
-                })
+                }),
+                70.verticalSpace,
+                SocialMedia(),
               ],
             ),
           ),

@@ -1,3 +1,4 @@
+import '../../model/message_model.dart';
 import '../../model/user_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'user_state.freezed.dart';
@@ -22,6 +23,8 @@ class UserState with _$UserState {
     @Default(false)  bool check,
     @Default(false) bool emptyImage,
   @Default(false) bool emptyName,
+    @Default([]) List<MessageModel> listOfMessage,
+    @Default(0) int messageCount,
 
     // bool checkPass,
     @Default(false)  bool checkConfirm,

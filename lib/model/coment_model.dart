@@ -1,26 +1,21 @@
 import 'package:xmusic/model/user_model.dart';
 
-class ComentModel {
+class FeedbackModel {
   final String title;
   final String userId;
   final UserModel? user;
-  final String comentId;
+  final String? comentId;
 
-  ComentModel({
+  FeedbackModel({
     required this.title,
     this.user,
     required this.userId,
-    required this.comentId,
+     this.comentId,
   });
 
-  factory ComentModel.fromJson({
-    required String title,
-    UserModel? user,
-    required String userId,
-    required String comentId,
-  }) {
-    return ComentModel(
-        title: title, user: user, userId: userId, comentId: comentId);
+  factory FeedbackModel.fromJson({required Map<String,dynamic>? data,required String comentId}) {
+    return FeedbackModel(
+        title:data? ["title"], user: data?["user"], userId: data?["userId"], comentId: comentId);
   }
 
   toJson() {

@@ -12,8 +12,10 @@ import 'package:xmusic/viwe/components/background_widget.dart';
 
 import 'package:xmusic/viwe/components/button/button_effect.dart';
 import 'package:xmusic/viwe/components/custom_category.dart';
+import 'package:xmusic/viwe/components/notification_widget.dart';
 import 'package:xmusic/viwe/components/rating_bar.dart';
 import 'package:xmusic/viwe/components/style.dart';
+import 'package:xmusic/viwe/pages/home/messages/message_page.dart';
 import '../../../controller/audio_state/audio_state.dart';
 import '../../components/image/custom_network_image.dart';
 
@@ -61,17 +63,17 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.w),
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
                 child: Row(
                   children: [
                     IconButton(
                         onPressed: () {
                           Scaffold.of(context).openDrawer();
                         },
-                        icon: const Icon(Icons.menu,color: Style.blackColor,)),
+                        icon:  Icon(Icons.menu,color: mode ? Style.primaryColor : Style.darkPrimaryColor,)),
                     Text(
                       "XMusic",
-                      style: Style.boldText(),
+                      style: Style.boldText(color: mode ? Style.primaryColor : Style.darkPrimaryColor ),
                     ),
                     const Spacer(),
                     GestureDetector(
@@ -81,10 +83,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                         //       MaterialPageRoute(
                         //           builder: (_) => const HomePage2()));
                         // },
-                        child: AvatarImage(
-                          image: watch1.userModel?.avatar ?? "",
-                          size: 30,
-                        ))
+                        child: NotificationWidget(count: watch1.messageCount,color: mode ? Style.primaryColor : Style.darkPrimaryColor ,onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_)=>MessagesPage(listOfMessage: watch1.listOfMessage)));
+                        },))
                   ],
                 ),
               ),

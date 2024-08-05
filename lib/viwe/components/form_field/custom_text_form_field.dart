@@ -9,7 +9,9 @@ class CustomTextFormField extends StatelessWidget {
   final Widget? perfix;
   final Color borderColor;
   final bool obscure;
+  final int maxLines;
   final Color filledColor;
+  final double height;
   final TextInputType keyBoardType;
   final Function(String)? onChanged;
 
@@ -18,8 +20,10 @@ class CustomTextFormField extends StatelessWidget {
       required this.hint,
       this.controller,
       this.sufix,
+        this.maxLines=1,
       this.perfix,
       this.onChanged,
+        this.height=35,
         this.filledColor=Style.primaryColor,
       this.keyBoardType = TextInputType.text,
         this.obscure=false,
@@ -31,6 +35,7 @@ class CustomTextFormField extends StatelessWidget {
       onChanged: onChanged,
       controller: controller,
       obscureText:obscure ,
+      maxLines:maxLines ,
       keyboardType: keyBoardType,
       style: Style.normalText(color: Style.darkPrimaryColor),
       decoration: InputDecoration(
@@ -44,7 +49,7 @@ class CustomTextFormField extends StatelessWidget {
             borderSide: BorderSide(color: borderColor)),
         fillColor: filledColor.withOpacity(0.5),
         filled: true,
-        constraints: BoxConstraints.tightFor(height: 35.h),
+        constraints: BoxConstraints.tightFor(height: height.h),
         contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
 
         suffixIcon: sufix,

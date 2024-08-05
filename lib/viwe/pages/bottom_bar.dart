@@ -27,6 +27,7 @@ class _BottomBarState extends ConsumerState<BottomBar> {
     WidgetsBinding.instance.addPostFrameCallback((s){
       ref.read(audioProvider.notifier).fetchMusic();
       ref.read(userProvider.notifier).getUser();
+      ref.read(userProvider.notifier).getMessages4();
     });
     super.initState();
   }
