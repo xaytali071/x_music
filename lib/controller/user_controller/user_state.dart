@@ -20,6 +20,8 @@ class UserState with _$UserState {
     @Default(false) bool pass,
     @Default(false)  bool email,
     @Default(false)  bool check,
+    @Default(false) bool emptyImage,
+  @Default(false) bool emptyName,
 
     // bool checkPass,
     @Default(false)  bool checkConfirm,

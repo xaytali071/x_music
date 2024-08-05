@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/viwe/components/button_effect.dart';
+import 'package:xmusic/viwe/components/button/button_effect.dart';
 import 'package:xmusic/viwe/components/style.dart';
 
 class MiniShadowButton extends StatelessWidget {

@@ -10,10 +10,12 @@ class Style {
   static const blackColor50=Color(0x70000000);
   static const blackColor17=Color(0x17000000);
   static const whiteColor50=Color(0x60FFFFFF);
-  static const darkPrimaryColor=Color(0x70453671);
+  static const darkPrimaryColor=Color(0xff453671);
   static const primaryColor=Color(0xFFDAD4EC);
   static const redColor=Color(0xffF20826);
   static const transperntColor=Colors.transparent;
+  static const purple=Color(0xff4A148C);
+  static const greyColor=Color(0xFFBDBDBD);
 
 
   static const gradient = LinearGradient(
@@ -25,7 +27,7 @@ class Style {
   static const darkGradient = LinearGradient(
     begin: Alignment(0.00, -1.00),
     end: Alignment(0, 1),
-    colors: [Color(0x9E74264D), Colors.black],
+    colors: [Color(0x993A148C), Colors.black],
   );
 
 

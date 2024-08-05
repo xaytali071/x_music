@@ -1,17 +1,18 @@
-import 'package:flutter/cupertino.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/viwe/components/avatar_botton.dart';
+import 'package:xmusic/viwe/components/image/avatar_botton.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
-import 'package:xmusic/viwe/components/keyboard_dissimer.dart';
+import 'package:xmusic/viwe/components/form_field/keyboard_dissimer.dart';
+import 'package:xmusic/viwe/pages/bottom_bar.dart';
 import '../../../controller/providers.dart';
 import '../../../controller/user_controller/user_state.dart';
-import '../../components/custom_button.dart';
-import '../../components/custom_text_form_field.dart';
-import '../../components/mini_shadow_button.dart';
+import '../../components/button/custom_button.dart';
+import '../../components/form_field/custom_text_form_field.dart';
+import '../../components/button/mini_shadow_button.dart';
 import '../../components/style.dart';
-import '../home/home_page.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
@@ -125,8 +126,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                                 )),
                     ),
                     10.verticalSpace,
-                    (watch.errorText?.isEmpty ?? false)
-                        ? SizedBox.shrink()
+                    watch.errorText.isEmpty
+                        ? const SizedBox.shrink()
                         : Text(
                             watch.errorText ?? "",
                             style: Style.normalText(color: Style.redColor),
@@ -135,30 +136,40 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     watch.check
                         ? CustomButton(
                             text: "Next",
-                            onTap: () {
-                              (watch.imagePath?.isNotEmpty ?? false)
+                            onTap: () async {
+                              DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                              AndroidDeviceInfo androidInfo =
+                                  await deviceInfo.androidInfo;
+                              String? fcmToken =
+                                  await FirebaseMessaging.instance.getToken();
+
+                              watch.imagePath.isNotEmpty
                                   ? event.createImageUrl(
-                                      imagePath: watch.imagePath ?? "",
+                                      imagePath: watch.imagePath,
                                       onSuccess: () {
                                         event.createUser(
                                             name: name.text,
                                             password: password.text,
                                             email: email.text,
-                                            avatar: watch.imageUrl);
+                                            avatar: event.imgURl,
+                                        fcm:fcmToken,
+                                          model: "${androidInfo.board} ${androidInfo.model}"
+                                        );
                                       })
                                   : event.createUser(
                                       name: name.text,
                                       password: password.text,
                                       email: email.text,
-                                      avatar: "");
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => HomePage()));
+                                      avatar: "",
+                                  fcm:fcmToken,
+                                  model:  "${androidInfo.board} ${androidInfo.model}",
+                              );
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>const BottomBar()),(_)=>false );
+
                             },
                             color: Style.darkPrimaryColor,
                           )
-                        : watch.isLoading ? CircularProgressIndicator()  : CustomButton(
+                        : watch.isLoading ? const CircularProgressIndicator()  : CustomButton(
                             text: "Next",
                             onTap: () {
                               event
@@ -177,19 +188,32 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       children: [
                         MiniShadowButton(
                           image: "assets/Google.png",
-                          onTap: () {
-                            event.loginGoogle(() {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => HomePage()));
-                            });
-                          },
+                          onTap: () async {
+                            DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                            AndroidDeviceInfo androidInfo =
+                                await deviceInfo.androidInfo;
+                            String? fcmToken =
+                                await FirebaseMessaging.instance.getToken();
+
+                            event.registrGoogle(onSuccess:() {
+                                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>const BottomBar()),(_)=>false );
+                              }, fcm: fcmToken, model: "${androidInfo.board} ${androidInfo.model}");
+                            },
+
                         ),
                         50.horizontalSpace,
                         MiniShadowButton(
                           image: "assets/Facebook.png",
-                          onTap: () {},
+                          onTap: () async {
+                            DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                            AndroidDeviceInfo androidInfo =
+                                await deviceInfo.androidInfo;
+                            String? fcmToken =
+                                await FirebaseMessaging.instance.getToken();
+                            event.reisterFacebook(fcm:fcmToken , model:  "${androidInfo.board} ${androidInfo.model}", onSuccess: (){
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>const BottomBar()),(_)=>false );
+                            });
+                          },
                         )
                       ],
                     ),

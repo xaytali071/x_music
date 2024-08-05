@@ -1,30 +1,38 @@
+
 import 'package:xmusic/model/author_model.dart';
 
 class MusicModel{
    String? trackUrl;
    String? trackName;
-   AuthorModel? artistData;
+   String? artistImage;
+   String? artistName;
   num? rating;
-  String? artistId;
   String? ganre;
   int? year;
   String? other;
   String? id;
-  MusicModel({this.trackUrl, this.trackName, this.artistData,this.rating,this.ganre,this.artistId,this.year,this.other,this.id});
+  List<String>? userIdList;
+  MusicModel({this.trackUrl, this.trackName, this.rating,this.ganre,this.artistImage,this.artistName,this.year,this.other,this.id,this.userIdList});
 
 
-  factory MusicModel.fromJson({ required Map<String,dynamic>? data,required AuthorModel? authorData,required String id,required String audUrl}){
+  factory MusicModel.fromJson({ required Map<String,dynamic>? data,required String id,}){
+
+    List<String>? list = [];
+    data?["userId"]?.forEach((e){
+      list.add(e);
+    });
+
     return MusicModel(
-      trackUrl: audUrl,
+      trackUrl: data?["track"],
       trackName: data?["trackName"],
-      artistData: authorData,
       rating: data?["rating"],
       ganre: data?["ganre"],
-      artistId: data?["artistId"],
+      artistImage: data?["artistImage"],
+      artistName: data?["artistName"],
       year: data?["year"],
       other: data?["other"],
-      id: id
-
+      id: id,
+      userIdList: list,
     );
   }
 
@@ -34,7 +42,8 @@ class MusicModel{
       "trackName":trackName,
       "rating":rating,
       "ganre":ganre,
-      "artistId":artistId,
+      "artistName":artistName,
+      "artistImage":artistImage,
       "year":year,
       "other":other,
     };

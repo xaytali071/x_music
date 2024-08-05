@@ -29,7 +29,9 @@ mixin _$UserState {
   bool get name => throw _privateConstructorUsedError;
   bool get pass => throw _privateConstructorUsedError;
   bool get email => throw _privateConstructorUsedError;
-  bool get check => throw _privateConstructorUsedError; // bool checkPass,
+  bool get check => throw _privateConstructorUsedError;
+  bool get emptyImage => throw _privateConstructorUsedError;
+  bool get emptyName => throw _privateConstructorUsedError; // bool checkPass,
   bool get checkConfirm => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -57,6 +59,8 @@ abstract class $UserStateCopyWith<$Res> {
       bool pass,
       bool email,
       bool check,
+      bool emptyImage,
+      bool emptyName,
       bool checkConfirm});
 }
 
@@ -87,6 +91,8 @@ class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
     Object? pass = null,
     Object? email = null,
     Object? check = null,
+    Object? emptyImage = null,
+    Object? emptyName = null,
     Object? checkConfirm = null,
   }) {
     return _then(_value.copyWith(
@@ -146,6 +152,14 @@ class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
           ? _value.check
           : check // ignore: cast_nullable_to_non_nullable
               as bool,
+      emptyImage: null == emptyImage
+          ? _value.emptyImage
+          : emptyImage // ignore: cast_nullable_to_non_nullable
+              as bool,
+      emptyName: null == emptyName
+          ? _value.emptyName
+          : emptyName // ignore: cast_nullable_to_non_nullable
+              as bool,
       checkConfirm: null == checkConfirm
           ? _value.checkConfirm
           : checkConfirm // ignore: cast_nullable_to_non_nullable
@@ -177,6 +191,8 @@ abstract class _$$UserStateImplCopyWith<$Res>
       bool pass,
       bool email,
       bool check,
+      bool emptyImage,
+      bool emptyName,
       bool checkConfirm});
 }
 
@@ -205,6 +221,8 @@ class __$$UserStateImplCopyWithImpl<$Res>
     Object? pass = null,
     Object? email = null,
     Object? check = null,
+    Object? emptyImage = null,
+    Object? emptyName = null,
     Object? checkConfirm = null,
   }) {
     return _then(_$UserStateImpl(
@@ -264,6 +282,14 @@ class __$$UserStateImplCopyWithImpl<$Res>
           ? _value.check
           : check // ignore: cast_nullable_to_non_nullable
               as bool,
+      emptyImage: null == emptyImage
+          ? _value.emptyImage
+          : emptyImage // ignore: cast_nullable_to_non_nullable
+              as bool,
+      emptyName: null == emptyName
+          ? _value.emptyName
+          : emptyName // ignore: cast_nullable_to_non_nullable
+              as bool,
       checkConfirm: null == checkConfirm
           ? _value.checkConfirm
           : checkConfirm // ignore: cast_nullable_to_non_nullable
@@ -290,6 +316,8 @@ class _$UserStateImpl implements _UserState {
       this.pass = false,
       this.email = false,
       this.check = false,
+      this.emptyImage = false,
+      this.emptyName = false,
       this.checkConfirm = false});
 
   @override
@@ -333,6 +361,12 @@ class _$UserStateImpl implements _UserState {
   @override
   @JsonKey()
   final bool check;
+  @override
+  @JsonKey()
+  final bool emptyImage;
+  @override
+  @JsonKey()
+  final bool emptyName;
 // bool checkPass,
   @override
   @JsonKey()
@@ -340,7 +374,7 @@ class _$UserStateImpl implements _UserState {
 
   @override
   String toString() {
-    return 'UserState(isGoogleLoading: $isGoogleLoading, isFacebookLoading: $isFacebookLoading, isLoading: $isLoading, userModel: $userModel, verificationId: $verificationId, phone: $phone, errorText: $errorText, imageUrl: $imageUrl, imagePath: $imagePath, isHide: $isHide, name: $name, pass: $pass, email: $email, check: $check, checkConfirm: $checkConfirm)';
+    return 'UserState(isGoogleLoading: $isGoogleLoading, isFacebookLoading: $isFacebookLoading, isLoading: $isLoading, userModel: $userModel, verificationId: $verificationId, phone: $phone, errorText: $errorText, imageUrl: $imageUrl, imagePath: $imagePath, isHide: $isHide, name: $name, pass: $pass, email: $email, check: $check, emptyImage: $emptyImage, emptyName: $emptyName, checkConfirm: $checkConfirm)';
   }
 
   @override
@@ -370,6 +404,10 @@ class _$UserStateImpl implements _UserState {
             (identical(other.pass, pass) || other.pass == pass) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.check, check) || other.check == check) &&
+            (identical(other.emptyImage, emptyImage) ||
+                other.emptyImage == emptyImage) &&
+            (identical(other.emptyName, emptyName) ||
+                other.emptyName == emptyName) &&
             (identical(other.checkConfirm, checkConfirm) ||
                 other.checkConfirm == checkConfirm));
   }
@@ -391,6 +429,8 @@ class _$UserStateImpl implements _UserState {
       pass,
       email,
       check,
+      emptyImage,
+      emptyName,
       checkConfirm);
 
   @JsonKey(ignore: true)
@@ -416,6 +456,8 @@ abstract class _UserState implements UserState {
       final bool pass,
       final bool email,
       final bool check,
+      final bool emptyImage,
+      final bool emptyName,
       final bool checkConfirm}) = _$UserStateImpl;
 
   @override
@@ -446,6 +488,10 @@ abstract class _UserState implements UserState {
   bool get email;
   @override
   bool get check;
+  @override
+  bool get emptyImage;
+  @override
+  bool get emptyName;
   @override // bool checkPass,
   bool get checkConfirm;
   @override

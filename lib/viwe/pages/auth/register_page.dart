@@ -1,17 +1,17 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/controller/providers.dart';
-import 'package:xmusic/controller/user_controller/user_cubit.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
-import 'package:xmusic/viwe/components/custom_button.dart';
-import 'package:xmusic/viwe/components/custom_text_form_field.dart';
-import 'package:xmusic/viwe/components/keyboard_dissimer.dart';
-import 'package:xmusic/viwe/components/mini_shadow_button.dart';
+import 'package:xmusic/viwe/components/button/custom_button.dart';
+import 'package:xmusic/viwe/components/form_field/custom_text_form_field.dart';
+import 'package:xmusic/viwe/components/form_field/keyboard_dissimer.dart';
+import 'package:xmusic/viwe/components/button/mini_shadow_button.dart';
 import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/pages/auth/sign_up_page.dart';
-import 'package:xmusic/viwe/pages/home/home_page.dart';
+import 'package:xmusic/viwe/pages/bottom_bar.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -23,10 +23,12 @@ class RegisterPage extends ConsumerStatefulWidget {
 class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   void initState() {
-    ref.read(userProvider.notifier)
-      ..changeName(false)
-      ..checkConfirmPassword("12345678", "12345678")
-      ..errorText("");
+    WidgetsBinding.instance.addPostFrameCallback((s){
+      ref.read(userProvider.notifier)
+        ..changeName(false)
+        ..checkConfirmPassword("12345678", "12345678")
+        ..errorText("");
+    });
     super.initState();
   }
 
@@ -88,23 +90,26 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                 )),
                     ),
                     10.verticalSpace,
-                    (watch.errorText.isEmpty ?? false)
+                    (watch.errorText.isEmpty)
                         ? SizedBox.shrink()
                         : Text(
-                            watch.errorText ?? "",
+                            watch.errorText ,
                             style: Style.normalText(color: Style.redColor),
                           ),
                     100.verticalSpace,
                     watch.check
                         ? CustomButton(
                             text: "Next",
-                            onTap: () {
+                            onTap: () async {
+                              String? fcmToken =
+                                  await FirebaseMessaging.instance.getToken();
                               event
                                   .login(email: email.text,password: password.text,onSuccess:  () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const HomePage()));
+                                    event.updateFcm(fcmToken ?? "", (){
+                                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>const BottomBar()),(_)=>false );
+
+                                    });
+
                               });
                             },
                             color: Style.darkPrimaryColor,
@@ -128,12 +133,29 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       children: [
                         MiniShadowButton(
                           image: "assets/Google.png",
-                          onTap: () {},
+                          onTap: () async {
+                            String? fcmToken =
+                                await FirebaseMessaging.instance.getToken();
+                            event.loginGoogle(onSuccess: (){
+                              event.updateFcm(fcmToken ?? "", (){
+
+                                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>const BottomBar()),(_)=>false );
+                              });
+                            });
+                          },
                         ),
                         50.horizontalSpace,
                         MiniShadowButton(
                           image: "assets/Facebook.png",
-                          onTap: () {},
+                          onTap: () async {
+                            String? fcmToken =
+                                await FirebaseMessaging.instance.getToken();
+                            event.loginFacebook(onSuccess: (){
+                              event.updateFcm(fcmToken ?? "", (){
+                                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>const BottomBar()),(_)=>false );
+                              });
+                            });
+                          },
                         )
                       ],
                     ),

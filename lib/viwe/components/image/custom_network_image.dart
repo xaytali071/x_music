@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/viwe/components/shimmer_item.dart';
+import 'package:xmusic/viwe/components/image/shimmer_item.dart';
 
 class CustomImageNetwork extends StatelessWidget {
   final String? image;

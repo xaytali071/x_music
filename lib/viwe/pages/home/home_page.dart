@@ -1,25 +1,21 @@
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:xmusic/controller/app_controller/app_cubit.dart';
 import 'package:xmusic/controller/providers.dart';
-import 'package:xmusic/controller/user_controller/user_cubit.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
 import 'package:xmusic/viwe/add/HomePage2.dart';
-import 'package:xmusic/viwe/components/avatar_image.dart';
+import 'package:xmusic/viwe/components/image/avatar_image.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
 
-import 'package:xmusic/viwe/components/button_effect.dart';
+import 'package:xmusic/viwe/components/button/button_effect.dart';
 import 'package:xmusic/viwe/components/custom_category.dart';
+import 'package:xmusic/viwe/components/rating_bar.dart';
 import 'package:xmusic/viwe/components/style.dart';
-import 'package:xmusic/viwe/components/tab_widget.dart';
 import '../../../controller/audio_state/audio_state.dart';
-import '../../components/custom_network_image.dart';
-import '../bottom_bar.dart';
+import '../../components/image/custom_network_image.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -32,22 +28,7 @@ AudioPlayer playerAudio = AudioPlayer();
 int selIndex = 0;
 
 class _HomePageState extends ConsumerState<HomePage> {
-  notification() {
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-          id: 1,
-          channelKey: "music",
-          body: "Music",
-          title: "music",
-          notificationLayout: NotificationLayout.Messaging),
-      actionButtons: [
-        NotificationActionButton(
-            key: "next", label: "Next", actionType: ActionType.KeepOnTop),
-      ],
-    );
-  }
 
-  int page = 2;
   RefreshController refreshController = RefreshController();
 
   @override
@@ -61,6 +42,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     AudioState watch = ref.watch(audioProvider);
     final event = ref.read(audioProvider.notifier);
     UserState watch1 = ref.watch(userProvider);
+    bool mode=ref.watch(appProvider).darkMode;
     return BackGroundWidget(
         child: SafeArea(
       child: SmartRefresher(
@@ -86,19 +68,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                         onPressed: () {
                           Scaffold.of(context).openDrawer();
                         },
-                        icon: const Icon(Icons.menu)),
+                        icon: const Icon(Icons.menu,color: Style.blackColor,)),
                     Text(
                       "XMusic",
                       style: Style.boldText(),
                     ),
                     const Spacer(),
                     GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage2()));
-                        },
+                        // onTap: () {
+                        //   Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //           builder: (_) => const HomePage2()));
+                        // },
                         child: AvatarImage(
                           image: watch1.userModel?.avatar ?? "",
                           size: 30,
@@ -106,10 +88,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
+
               10.verticalSpace,
-              const TabWidget(),
-              10.verticalSpace,
-              Category(list: watch.listOfAuthor),
+              const Category(list: ["Pop","Rok","Rep","Jaz","Audio kitob","Podcast","Intervyu"]),
               10.verticalSpace,
               // BannerWidget(list: state.listOfBanner ?? [],),
               10.verticalSpace,
@@ -121,16 +102,27 @@ class _HomePageState extends ConsumerState<HomePage> {
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         return InkWell(
-                            onTap: () async {
+                          // onLongPress: (){
+                          //   showDialog(context: context, builder: (_){
+                          //     return Dialog(
+                          //       child: (
+                          //       ElevatedButton(onPressed: (){
+                          //         event.deleteAudio(watch.listOfMusic[index].id ?? "");
+                          //       },child: Text("Delete"),)
+                          //       ),
+                          //     );
+                          //   });
+                          // },
+                            onTap: ()  {
                               selIndex = index;
-                              setState(() {});
-                              event
-                                ..getAudio(await event.getAudioUrl(
-                                        watch.listOfMusic[selIndex].trackUrl ??
-                                            "") ??
-                                    "")
-                                ..playy()
-                                ..selectMusic(index: index);
+                              event..selectMusic(index: index)..isSearchList(false);
+                              Future.delayed(const Duration(milliseconds: 700)).then((s){
+                                event
+                                  ..getAudio(watch.listOfMusic[index].trackUrl ?? "")
+                                  ..playy();
+
+                              });
+                              print(selIndex);
                             },
                             child: AnimationButtonEffect(
                               child: Container(
@@ -146,8 +138,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 child: Row(
                                   children: [
                                     CustomImageNetwork(
-                                        image:  watch.listOfMusic[index]
-                                                .artistData?.image ??
+                                        image:  watch.listOfMusic[index].artistImage ??
                                             "",
                                         width: 80,
                                         height: 80),
@@ -161,31 +152,36 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         SizedBox(
                                             width: 250.w,
                                             child: Text(
-                                              watch.listOfMusic[index]
-                                                      .artistData?.name ??
+                                              watch.listOfMusic[index].trackName ??
                                                   "",
                                               style: Style.normalText(
-                                                  color: watch.darkMode
+                                                  color:mode
                                                       ? Style.whiteColor50
                                                       : Style.blackColor),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                             )),
-                                        SizedBox(
-                                            width: 250.w,
-                                            child: Text(
-                                              watch.listOfMusic[index]
-                                                      .trackName ??
-                                                  "",
-                                              style: Style.miniText(
-                                                  color: watch.darkMode
-                                                      ? Style.whiteColor50
-                                                      : Style.blackColor),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ))
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                                width: 170.w,
+                                                child: Text(
+                                                  watch.listOfMusic[index]
+                                                          .artistName ??
+                                                      "",
+                                                  style: Style.miniText(
+                                                      color: mode
+                                                          ? Style.whiteColor50
+                                                          : Style.blackColor),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                )),
+                                            CustomRatingBar(rating: watch.listOfMusic[index].rating?.toDouble() ?? 0 / (watch.listOfMusic[index].userIdList?.length ?? 0))
+
+                                          ],
+                                        )
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),

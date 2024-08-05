@@ -1,23 +1,25 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
+import 'package:xmusic/viwe/components/style.dart';
 
 import '../../model/user_model.dart';
-import '../localStore/local_store.dart';
+import '../local_store.dart';
 
 class UserNotifire extends StateNotifier<UserState> {
   UserNotifire() : super(UserState());
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final ImagePicker image = ImagePicker();
+  String imgURl="";
 
   Future<bool> checkPhone(String phone) async {
     try {
@@ -69,7 +71,7 @@ class UserNotifire extends StateNotifier<UserState> {
   getUser() async {
     var res = await firestore
         .collection("users")
-        .doc(await LocaleStore.getId())
+        .doc(LocaleStore.getId())
         .get();
     UserModel newModel = UserModel.fromJson(data: res.data());
     state = (state.copyWith(userModel: newModel));
@@ -96,6 +98,8 @@ class UserNotifire extends StateNotifier<UserState> {
       required String password,
       required String email,
       required String? avatar,
+        required String? fcm,
+        required String? model,
       VoidCallback? onSuccess}) async {
     firestore
         .collection("users")
@@ -104,6 +108,8 @@ class UserNotifire extends StateNotifier<UserState> {
           password: password,
           email: email,
           avatar: avatar,
+      fcm: fcm,
+      model: model,
         ).toJson())
         .then((value) async {
       await LocaleStore.setId(value.id);
@@ -116,60 +122,40 @@ class UserNotifire extends StateNotifier<UserState> {
     final storageRef = FirebaseStorage.instance
         .ref()
         .child("musicImage/${DateTime.now().toString()}");
-    await storageRef.putFile(File(imagePath ?? ""));
-
+    await storageRef.putFile(File(imagePath));
     String imageUrl = await storageRef.getDownloadURL();
+    imgURl=imageUrl;
     state = (state.copyWith(imageUrl: imageUrl));
     onSuccess?.call();
   }
 
-  loginGoogle(VoidCallback onSuccess) async {
-    state = (state.copyWith(isGoogleLoading: true));
-    GoogleSignIn googleSignIn = GoogleSignIn();
-    GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser?.authentication != null) {
-      GoogleSignInAuthentication? googleAuth = await googleUser!.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+  registrGoogle({required String? fcm,required String model,required VoidCallback? onSuccess}) async {
+    try {
+      state=(state.copyWith(isGoogleLoading: true));
+      GoogleSignIn googleSignIn = GoogleSignIn();
+      GoogleSignInAccount? googleUser = await googleSignIn.signIn().then((s){
+        createUser(name: s?.displayName ?? "", password: s?.id ?? "", email: s?.email ?? "", avatar: s?.photoUrl, fcm: fcm, model: model);
+        onSuccess?.call();
+        state=(state.copyWith(isGoogleLoading: false,isLoading: false));
+      });
 
-      final userObj =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      debugPrint("${userObj.additionalUserInfo?.isNewUser}");
-      if (userObj.additionalUserInfo?.isNewUser ?? true) {
-        // sing in
-        firestore
-            .collection("users")
-            .add(UserModel(
-              name: userObj.user?.displayName ?? "",
-              password: userObj.user?.uid ?? "",
-              email: userObj.user?.email ?? "",
-              avatar: userObj.user?.photoURL ?? "",
-            ).toJson())
-            .then((value) async {
-          await LocaleStore.setId(value.id);
-          onSuccess();
-          googleSignIn.signOut();
-        });
-      } else {
-        // sing up
-        var res = await firestore
-            .collection("users")
-            .where("email", isEqualTo: userObj.user?.email)
-            .get();
-
-        if (res.docs.isNotEmpty) {
-          await LocaleStore.setId(res.docs.first.id);
-          onSuccess();
-        }
+    } catch (e) {
+      if (kDebugMode) {
+        state=(state.copyWith(isGoogleLoading: false,isLoading: false));
       }
+      state=(state.copyWith(isGoogleLoading: false,isLoading: false));
     }
 
-    state = (state.copyWith(isGoogleLoading: false));
   }
 
-  loginFacebook(VoidCallback onSuccess) async {
+  updateFcm(String fcm,VoidCallback onSuccess) async {
+    state=(state.copyWith(isLoading: true));
+    firestore.collection("users").doc(await LocaleStore.getId()).update({"fcmToken":fcm});
+    state=(state.copyWith(isLoading: false));
+    onSuccess.call();
+  }
+
+  reisterFacebook({required String? fcm,required String model,required VoidCallback? onSuccess}) async {
     state = (state.copyWith(isFacebookLoading: true));
     final fb = FacebookLogin();
     final user = await fb.logIn(permissions: [
@@ -191,10 +177,12 @@ class UserNotifire extends StateNotifier<UserState> {
               password: userObj.user?.uid ?? "",
               email: userObj.user?.email ?? "",
               avatar: userObj.user?.photoURL ?? "",
+          fcm: fcm,
+          model: model,
             ).toJson())
             .then((value) async {
           await LocaleStore.setId(value.id);
-          onSuccess();
+          onSuccess?.call();
         });
       } else {
         // sing up
@@ -205,7 +193,7 @@ class UserNotifire extends StateNotifier<UserState> {
 
         if (res.docs.isNotEmpty) {
           await LocaleStore.setId(res.docs.first.id);
-          onSuccess();
+          onSuccess?.call();
         }
       }
     }
@@ -213,32 +201,87 @@ class UserNotifire extends StateNotifier<UserState> {
     state = (state.copyWith(isFacebookLoading: false));
   }
 
-  logOut(VoidCallback onSuccess) async {
-    await firestore.collection("users").doc(await LocaleStore.getId()).delete();
+  deleteAccount(VoidCallback onSuccess) async {
+     await firestore.collection("users").doc(LocaleStore.getId()).delete();
     await LocaleStore.storeClear();
+    Fluttertoast.showToast(
+        msg: "Success",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Style.primaryColor,
+        textColor: Style.whiteColor,
+        fontSize: 16.0);
     onSuccess();
   }
 
-  editName({required String name, required VoidCallback onSuccess}) async {
-    if (name.isNotEmpty) {
-      await firestore
-          .collection("users")
-          .doc(await LocaleStore.getId())
-          .update({'name': name});
+  logOut(VoidCallback onSuccess) async {
+    await LocaleStore.storeClear();
+    Fluttertoast.showToast(
+        msg: "Success",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Style.primaryColor,
+        textColor: Style.whiteColor,
+        fontSize: 16.0);
+    onSuccess();
+  }
 
-      UserModel userModel = UserModel(
-        name: name,
-        password: state.userModel?.password,
-        email: state.userModel?.email,
-      );
-      onSuccess();
-
-      state = (state.copyWith(userModel: userModel));
+  loginGoogle({required VoidCallback? onSuccess}) async {
+    try {
+      state=(state.copyWith(isGoogleLoading: true));
+      GoogleSignIn googleSignIn = GoogleSignIn();
+      GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+     login(email: googleUser?.email ?? "", password: googleUser?.id ?? "");
+      onSuccess?.call();
+      state=(state.copyWith(isGoogleLoading: false,isLoading: false));
+    } catch (e) {
+      if (kDebugMode) {
+        state=(state.copyWith(isGoogleLoading: false,isLoading: false));
+      }
+      state=(state.copyWith(isGoogleLoading: false,isLoading: false));
     }
   }
 
+  loginFacebook({required VoidCallback? onSuccess}) async {
+    state = (state.copyWith(isFacebookLoading: true));
+    final fb = FacebookLogin();
+    final user = await fb.logIn(permissions: [
+      FacebookPermission.email,
+      FacebookPermission.publicProfile
+    ]);
+    if (user.status == FacebookLoginStatus.success) {
+      final OAuthCredential credential =
+      FacebookAuthProvider.credential(user.accessToken?.token ?? "");
+
+      final userObj =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      if (userObj.additionalUserInfo?.isNewUser ?? true) {}
+      login(email: userObj.user?.email ?? "", password: userObj.user?.uid ?? '',onSuccess: onSuccess?.call);
+
+    }
+  }
+
+  editName({required String name, required VoidCallback onSuccess}) async {
+    state=state.copyWith(isLoading: true);
+      await firestore
+          .collection("users")
+          .doc(LocaleStore.getId())
+          .update({'name': name});
+      UserModel userModel=UserModel(
+        name: name,
+        email: state.userModel?.email,
+        model: state.userModel?.model,
+        avatar: state.userModel?.avatar,
+      );
+      state = state.copyWith(isLoading: false,userModel: userModel);
+      onSuccess.call();
+
+  }
+
   getImageGallery(VoidCallback onSuccess) async {
-    await image.pickImage(source: ImageSource.gallery).then((value) async {
+    await image.pickImage(source: ImageSource.gallery,imageQuality: 70).then((value) async {
       if (value != null) {
         CroppedFile? cropperImage =
             await ImageCropper().cropImage(sourcePath: value.path);
@@ -267,17 +310,33 @@ class UserNotifire extends StateNotifier<UserState> {
             errorText:
                 "Password xatto bolishi mumkin yoki bunaqa nomer bn sign up qilinmagan",
             isLoading: false));
+        Fluttertoast.showToast(
+            msg: "Email or password is incorrect",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Style.primaryColor,
+            textColor: Style.whiteColor,
+            fontSize: 16.0);
       }
     } catch (e) {
       state = (state.copyWith(
           errorText:
               "Password xatto bolishi mumkin yoki bunaqa nomer bn sign up qilinmagan",
           isLoading: false));
+      Fluttertoast.showToast(
+          msg: "Email or password is incorrect",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Style.primaryColor,
+          textColor: Style.whiteColor,
+          fontSize: 16.0);
     }
   }
 
-  editImage(VoidCallback onSuccess) async {
-    await getImageGallery(() async {
+  editImage({required VoidCallback onSuccess}) async {
+    state=state.copyWith(isLoading: true);
       final storageRef = FirebaseStorage.instance
           .ref()
           .child("userImage/${DateTime.now().toString()}");
@@ -288,13 +347,32 @@ class UserNotifire extends StateNotifier<UserState> {
           .collection("users")
           .doc(await LocaleStore.getId())
           .update({'avatar': url});
-      onSuccess();
+
+    UserModel userModel=UserModel(
+      name: state.userModel?.name,
+      email: state.userModel?.email,
+      model: state.userModel?.model,
+      avatar: state.imagePath,
+    );
+    deleteFile(imagUrl: state.userModel?.avatar ?? "");
+    state=state.copyWith(isLoading: false,userModel: userModel);
+      onSuccess.call();
+  }
+
+
+  deleteFile({required String imagUrl}) async {
+    Reference photoRef =FirebaseStorage.instance.refFromURL(imagUrl);
+    await photoRef.delete().then((value) {
+      print('deleted Successfully');
     });
   }
 
   hidePassword() {
-    state = (state.copyWith(isHide: state.isHide !=state.isHide));
+    bool s=state.isHide;
+    s=s=!s;
+    state =state.copyWith(isHide: s);
   }
+
 
   changeName(bool isEmpty) {
     state.name == isEmpty;
@@ -311,10 +389,7 @@ class UserNotifire extends StateNotifier<UserState> {
   checkConfirmPassword(String password, String password2) {
  //   state.checkConfirm = password == password2;
     print(state.checkConfirm);
-    if (state.email == false &&
-        state.name == false &&
-        state.pass == false &&
-        state.checkConfirm == false) {
+    if (password==password2) {
       state = (state.copyWith(check: true, errorText: ""));
     } else {
       state =
@@ -353,5 +428,13 @@ class UserNotifire extends StateNotifier<UserState> {
 
   errorText(String text) {
     state = (state.copyWith(errorText: text));
+  }
+
+  emptyImage(String s){
+state=state.copyWith(emptyImage: s=="");
+  }
+
+  emptyName(String s){
+    state=state.copyWith(emptyName: s=="");
   }
 }

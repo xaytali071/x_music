@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:xmusic/model/author_model.dart';
 import 'package:xmusic/model/music_model.dart';
 
-import '../../controller/audio_state/audio_cubit.dart';
 import '../pages/home/home_page.dart';
 
 class AddProduct extends StatefulWidget {
@@ -100,7 +99,7 @@ class _AddProductState extends State<AddProduct> {
                       firestore
                           .collection("music")
                           .add(MusicModel(
-                          artistData: AuthorModel(),
+
                           trackName: trackNameController.text,
                           trackUrl: musicUrl)
                           .toJson())

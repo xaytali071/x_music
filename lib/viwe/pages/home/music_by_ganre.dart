@@ -10,20 +10,21 @@ import '../../components/image/custom_network_image.dart';
 import '../../components/style.dart';
 import 'home_page.dart';
 
-class MusicByArtist extends ConsumerStatefulWidget {
+class MusicByGanre extends ConsumerStatefulWidget {
   final String name;
-  const MusicByArtist({super.key,required this.name, });
+  const MusicByGanre({super.key,required this.name, });
 
   @override
-  ConsumerState<MusicByArtist> createState() => _MusicByArtistState();
+  ConsumerState<MusicByGanre> createState() => _MusicByArtistState();
 }
 
-class _MusicByArtistState extends ConsumerState<MusicByArtist> {
+class _MusicByArtistState extends ConsumerState<MusicByGanre> {
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((d){
-      ref.read(audioProvider.notifier).searchMusicbyAuthor(name:widget.name );
+        ref.read(audioProvider.notifier).searchMusicbyGanre(name: widget.name);
+
     });
     super.initState();
   }

@@ -21,20 +21,23 @@ mixin _$AudioState {
   bool get isSilent => throw _privateConstructorUsedError;
   double? get speed => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
-  int? get selectIndex => throw _privateConstructorUsedError;
+  int get selectIndex => throw _privateConstructorUsedError;
   List<MusicModel> get listOfMusic => throw _privateConstructorUsedError;
   List<String> get listOfDoc => throw _privateConstructorUsedError;
   String get localAudioPath => throw _privateConstructorUsedError;
-  bool get darkMode => throw _privateConstructorUsedError;
   String get imagePath => throw _privateConstructorUsedError;
   MusicModel? get music => throw _privateConstructorUsedError;
   List<AuthorModel> get listOfAuthor => throw _privateConstructorUsedError;
   dynamic get audio => throw _privateConstructorUsedError;
   dynamic get imageUrl => throw _privateConstructorUsedError;
-  List<MusicModel> get listOfMusicArtist =>
-      throw _privateConstructorUsedError; // @Default([]) List<DocumentSnapshot<MusicModel>> listOfMusic,
+  List<MusicModel> get listOfMusicArtist => throw _privateConstructorUsedError;
+  List<MusicModel> get listOfSearchRes => throw _privateConstructorUsedError;
   bool get hasMoreData => throw _privateConstructorUsedError;
   DocumentSnapshot<Object?>? get lastDocument =>
+      throw _privateConstructorUsedError;
+  bool get isSearchList => throw _privateConstructorUsedError;
+  String get filePath => throw _privateConstructorUsedError;
+  List<AuthorModel> get listOfSearchAuthor =>
       throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -54,19 +57,22 @@ abstract class $AudioStateCopyWith<$Res> {
       bool isSilent,
       double? speed,
       bool isLoading,
-      int? selectIndex,
+      int selectIndex,
       List<MusicModel> listOfMusic,
       List<String> listOfDoc,
       String localAudioPath,
-      bool darkMode,
       String imagePath,
       MusicModel? music,
       List<AuthorModel> listOfAuthor,
       dynamic audio,
       dynamic imageUrl,
       List<MusicModel> listOfMusicArtist,
+      List<MusicModel> listOfSearchRes,
       bool hasMoreData,
-      DocumentSnapshot<Object?>? lastDocument});
+      DocumentSnapshot<Object?>? lastDocument,
+      bool isSearchList,
+      String filePath,
+      List<AuthorModel> listOfSearchAuthor});
 }
 
 /// @nodoc
@@ -87,19 +93,22 @@ class _$AudioStateCopyWithImpl<$Res, $Val extends AudioState>
     Object? isSilent = null,
     Object? speed = freezed,
     Object? isLoading = null,
-    Object? selectIndex = freezed,
+    Object? selectIndex = null,
     Object? listOfMusic = null,
     Object? listOfDoc = null,
     Object? localAudioPath = null,
-    Object? darkMode = null,
     Object? imagePath = null,
     Object? music = freezed,
     Object? listOfAuthor = null,
     Object? audio = freezed,
     Object? imageUrl = freezed,
     Object? listOfMusicArtist = null,
+    Object? listOfSearchRes = null,
     Object? hasMoreData = null,
     Object? lastDocument = freezed,
+    Object? isSearchList = null,
+    Object? filePath = null,
+    Object? listOfSearchAuthor = null,
   }) {
     return _then(_value.copyWith(
       isPlay: null == isPlay
@@ -122,10 +131,10 @@ class _$AudioStateCopyWithImpl<$Res, $Val extends AudioState>
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
-      selectIndex: freezed == selectIndex
+      selectIndex: null == selectIndex
           ? _value.selectIndex
           : selectIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
       listOfMusic: null == listOfMusic
           ? _value.listOfMusic
           : listOfMusic // ignore: cast_nullable_to_non_nullable
@@ -138,10 +147,6 @@ class _$AudioStateCopyWithImpl<$Res, $Val extends AudioState>
           ? _value.localAudioPath
           : localAudioPath // ignore: cast_nullable_to_non_nullable
               as String,
-      darkMode: null == darkMode
-          ? _value.darkMode
-          : darkMode // ignore: cast_nullable_to_non_nullable
-              as bool,
       imagePath: null == imagePath
           ? _value.imagePath
           : imagePath // ignore: cast_nullable_to_non_nullable
@@ -166,6 +171,10 @@ class _$AudioStateCopyWithImpl<$Res, $Val extends AudioState>
           ? _value.listOfMusicArtist
           : listOfMusicArtist // ignore: cast_nullable_to_non_nullable
               as List<MusicModel>,
+      listOfSearchRes: null == listOfSearchRes
+          ? _value.listOfSearchRes
+          : listOfSearchRes // ignore: cast_nullable_to_non_nullable
+              as List<MusicModel>,
       hasMoreData: null == hasMoreData
           ? _value.hasMoreData
           : hasMoreData // ignore: cast_nullable_to_non_nullable
@@ -174,6 +183,18 @@ class _$AudioStateCopyWithImpl<$Res, $Val extends AudioState>
           ? _value.lastDocument
           : lastDocument // ignore: cast_nullable_to_non_nullable
               as DocumentSnapshot<Object?>?,
+      isSearchList: null == isSearchList
+          ? _value.isSearchList
+          : isSearchList // ignore: cast_nullable_to_non_nullable
+              as bool,
+      filePath: null == filePath
+          ? _value.filePath
+          : filePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      listOfSearchAuthor: null == listOfSearchAuthor
+          ? _value.listOfSearchAuthor
+          : listOfSearchAuthor // ignore: cast_nullable_to_non_nullable
+              as List<AuthorModel>,
     ) as $Val);
   }
 }
@@ -192,19 +213,22 @@ abstract class _$$AudioStateImplCopyWith<$Res>
       bool isSilent,
       double? speed,
       bool isLoading,
-      int? selectIndex,
+      int selectIndex,
       List<MusicModel> listOfMusic,
       List<String> listOfDoc,
       String localAudioPath,
-      bool darkMode,
       String imagePath,
       MusicModel? music,
       List<AuthorModel> listOfAuthor,
       dynamic audio,
       dynamic imageUrl,
       List<MusicModel> listOfMusicArtist,
+      List<MusicModel> listOfSearchRes,
       bool hasMoreData,
-      DocumentSnapshot<Object?>? lastDocument});
+      DocumentSnapshot<Object?>? lastDocument,
+      bool isSearchList,
+      String filePath,
+      List<AuthorModel> listOfSearchAuthor});
 }
 
 /// @nodoc
@@ -223,19 +247,22 @@ class __$$AudioStateImplCopyWithImpl<$Res>
     Object? isSilent = null,
     Object? speed = freezed,
     Object? isLoading = null,
-    Object? selectIndex = freezed,
+    Object? selectIndex = null,
     Object? listOfMusic = null,
     Object? listOfDoc = null,
     Object? localAudioPath = null,
-    Object? darkMode = null,
     Object? imagePath = null,
     Object? music = freezed,
     Object? listOfAuthor = null,
     Object? audio = freezed,
     Object? imageUrl = freezed,
     Object? listOfMusicArtist = null,
+    Object? listOfSearchRes = null,
     Object? hasMoreData = null,
     Object? lastDocument = freezed,
+    Object? isSearchList = null,
+    Object? filePath = null,
+    Object? listOfSearchAuthor = null,
   }) {
     return _then(_$AudioStateImpl(
       isPlay: null == isPlay
@@ -258,10 +285,10 @@ class __$$AudioStateImplCopyWithImpl<$Res>
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
-      selectIndex: freezed == selectIndex
+      selectIndex: null == selectIndex
           ? _value.selectIndex
           : selectIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
       listOfMusic: null == listOfMusic
           ? _value._listOfMusic
           : listOfMusic // ignore: cast_nullable_to_non_nullable
@@ -274,10 +301,6 @@ class __$$AudioStateImplCopyWithImpl<$Res>
           ? _value.localAudioPath
           : localAudioPath // ignore: cast_nullable_to_non_nullable
               as String,
-      darkMode: null == darkMode
-          ? _value.darkMode
-          : darkMode // ignore: cast_nullable_to_non_nullable
-              as bool,
       imagePath: null == imagePath
           ? _value.imagePath
           : imagePath // ignore: cast_nullable_to_non_nullable
@@ -296,6 +319,10 @@ class __$$AudioStateImplCopyWithImpl<$Res>
           ? _value._listOfMusicArtist
           : listOfMusicArtist // ignore: cast_nullable_to_non_nullable
               as List<MusicModel>,
+      listOfSearchRes: null == listOfSearchRes
+          ? _value._listOfSearchRes
+          : listOfSearchRes // ignore: cast_nullable_to_non_nullable
+              as List<MusicModel>,
       hasMoreData: null == hasMoreData
           ? _value.hasMoreData
           : hasMoreData // ignore: cast_nullable_to_non_nullable
@@ -304,6 +331,18 @@ class __$$AudioStateImplCopyWithImpl<$Res>
           ? _value.lastDocument
           : lastDocument // ignore: cast_nullable_to_non_nullable
               as DocumentSnapshot<Object?>?,
+      isSearchList: null == isSearchList
+          ? _value.isSearchList
+          : isSearchList // ignore: cast_nullable_to_non_nullable
+              as bool,
+      filePath: null == filePath
+          ? _value.filePath
+          : filePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      listOfSearchAuthor: null == listOfSearchAuthor
+          ? _value._listOfSearchAuthor
+          : listOfSearchAuthor // ignore: cast_nullable_to_non_nullable
+              as List<AuthorModel>,
     ));
   }
 }
@@ -317,23 +356,28 @@ class _$AudioStateImpl implements _AudioState {
       this.isSilent = false,
       this.speed = 1,
       this.isLoading = false,
-      this.selectIndex,
+      this.selectIndex = -1,
       final List<MusicModel> listOfMusic = const [],
       final List<String> listOfDoc = const [],
       this.localAudioPath = "",
-      this.darkMode = false,
       this.imagePath = "",
       this.music,
       final List<AuthorModel> listOfAuthor = const [],
       this.audio = "",
       this.imageUrl = "",
       final List<MusicModel> listOfMusicArtist = const [],
+      final List<MusicModel> listOfSearchRes = const [],
       this.hasMoreData = true,
-      this.lastDocument})
+      this.lastDocument,
+      this.isSearchList = false,
+      this.filePath = "",
+      final List<AuthorModel> listOfSearchAuthor = const []})
       : _listOfMusic = listOfMusic,
         _listOfDoc = listOfDoc,
         _listOfAuthor = listOfAuthor,
-        _listOfMusicArtist = listOfMusicArtist;
+        _listOfMusicArtist = listOfMusicArtist,
+        _listOfSearchRes = listOfSearchRes,
+        _listOfSearchAuthor = listOfSearchAuthor;
 
   @override
   @JsonKey()
@@ -351,7 +395,8 @@ class _$AudioStateImpl implements _AudioState {
   @JsonKey()
   final bool isLoading;
   @override
-  final int? selectIndex;
+  @JsonKey()
+  final int selectIndex;
   final List<MusicModel> _listOfMusic;
   @override
   @JsonKey()
@@ -373,9 +418,6 @@ class _$AudioStateImpl implements _AudioState {
   @override
   @JsonKey()
   final String localAudioPath;
-  @override
-  @JsonKey()
-  final bool darkMode;
   @override
   @JsonKey()
   final String imagePath;
@@ -406,16 +448,39 @@ class _$AudioStateImpl implements _AudioState {
     return EqualUnmodifiableListView(_listOfMusicArtist);
   }
 
-// @Default([]) List<DocumentSnapshot<MusicModel>> listOfMusic,
+  final List<MusicModel> _listOfSearchRes;
+  @override
+  @JsonKey()
+  List<MusicModel> get listOfSearchRes {
+    if (_listOfSearchRes is EqualUnmodifiableListView) return _listOfSearchRes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_listOfSearchRes);
+  }
+
   @override
   @JsonKey()
   final bool hasMoreData;
   @override
   final DocumentSnapshot<Object?>? lastDocument;
+  @override
+  @JsonKey()
+  final bool isSearchList;
+  @override
+  @JsonKey()
+  final String filePath;
+  final List<AuthorModel> _listOfSearchAuthor;
+  @override
+  @JsonKey()
+  List<AuthorModel> get listOfSearchAuthor {
+    if (_listOfSearchAuthor is EqualUnmodifiableListView)
+      return _listOfSearchAuthor;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_listOfSearchAuthor);
+  }
 
   @override
   String toString() {
-    return 'AudioState(isPlay: $isPlay, isPause: $isPause, isSilent: $isSilent, speed: $speed, isLoading: $isLoading, selectIndex: $selectIndex, listOfMusic: $listOfMusic, listOfDoc: $listOfDoc, localAudioPath: $localAudioPath, darkMode: $darkMode, imagePath: $imagePath, music: $music, listOfAuthor: $listOfAuthor, audio: $audio, imageUrl: $imageUrl, listOfMusicArtist: $listOfMusicArtist, hasMoreData: $hasMoreData, lastDocument: $lastDocument)';
+    return 'AudioState(isPlay: $isPlay, isPause: $isPause, isSilent: $isSilent, speed: $speed, isLoading: $isLoading, selectIndex: $selectIndex, listOfMusic: $listOfMusic, listOfDoc: $listOfDoc, localAudioPath: $localAudioPath, imagePath: $imagePath, music: $music, listOfAuthor: $listOfAuthor, audio: $audio, imageUrl: $imageUrl, listOfMusicArtist: $listOfMusicArtist, listOfSearchRes: $listOfSearchRes, hasMoreData: $hasMoreData, lastDocument: $lastDocument, isSearchList: $isSearchList, filePath: $filePath, listOfSearchAuthor: $listOfSearchAuthor)';
   }
 
   @override
@@ -438,8 +503,6 @@ class _$AudioStateImpl implements _AudioState {
                 .equals(other._listOfDoc, _listOfDoc) &&
             (identical(other.localAudioPath, localAudioPath) ||
                 other.localAudioPath == localAudioPath) &&
-            (identical(other.darkMode, darkMode) ||
-                other.darkMode == darkMode) &&
             (identical(other.imagePath, imagePath) ||
                 other.imagePath == imagePath) &&
             (identical(other.music, music) || other.music == music) &&
@@ -449,33 +512,45 @@ class _$AudioStateImpl implements _AudioState {
             const DeepCollectionEquality().equals(other.imageUrl, imageUrl) &&
             const DeepCollectionEquality()
                 .equals(other._listOfMusicArtist, _listOfMusicArtist) &&
+            const DeepCollectionEquality()
+                .equals(other._listOfSearchRes, _listOfSearchRes) &&
             (identical(other.hasMoreData, hasMoreData) ||
                 other.hasMoreData == hasMoreData) &&
             (identical(other.lastDocument, lastDocument) ||
-                other.lastDocument == lastDocument));
+                other.lastDocument == lastDocument) &&
+            (identical(other.isSearchList, isSearchList) ||
+                other.isSearchList == isSearchList) &&
+            (identical(other.filePath, filePath) ||
+                other.filePath == filePath) &&
+            const DeepCollectionEquality()
+                .equals(other._listOfSearchAuthor, _listOfSearchAuthor));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      isPlay,
-      isPause,
-      isSilent,
-      speed,
-      isLoading,
-      selectIndex,
-      const DeepCollectionEquality().hash(_listOfMusic),
-      const DeepCollectionEquality().hash(_listOfDoc),
-      localAudioPath,
-      darkMode,
-      imagePath,
-      music,
-      const DeepCollectionEquality().hash(_listOfAuthor),
-      const DeepCollectionEquality().hash(audio),
-      const DeepCollectionEquality().hash(imageUrl),
-      const DeepCollectionEquality().hash(_listOfMusicArtist),
-      hasMoreData,
-      lastDocument);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        isPlay,
+        isPause,
+        isSilent,
+        speed,
+        isLoading,
+        selectIndex,
+        const DeepCollectionEquality().hash(_listOfMusic),
+        const DeepCollectionEquality().hash(_listOfDoc),
+        localAudioPath,
+        imagePath,
+        music,
+        const DeepCollectionEquality().hash(_listOfAuthor),
+        const DeepCollectionEquality().hash(audio),
+        const DeepCollectionEquality().hash(imageUrl),
+        const DeepCollectionEquality().hash(_listOfMusicArtist),
+        const DeepCollectionEquality().hash(_listOfSearchRes),
+        hasMoreData,
+        lastDocument,
+        isSearchList,
+        filePath,
+        const DeepCollectionEquality().hash(_listOfSearchAuthor)
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -491,19 +566,22 @@ abstract class _AudioState implements AudioState {
       final bool isSilent,
       final double? speed,
       final bool isLoading,
-      final int? selectIndex,
+      final int selectIndex,
       final List<MusicModel> listOfMusic,
       final List<String> listOfDoc,
       final String localAudioPath,
-      final bool darkMode,
       final String imagePath,
       final MusicModel? music,
       final List<AuthorModel> listOfAuthor,
       final dynamic audio,
       final dynamic imageUrl,
       final List<MusicModel> listOfMusicArtist,
+      final List<MusicModel> listOfSearchRes,
       final bool hasMoreData,
-      final DocumentSnapshot<Object?>? lastDocument}) = _$AudioStateImpl;
+      final DocumentSnapshot<Object?>? lastDocument,
+      final bool isSearchList,
+      final String filePath,
+      final List<AuthorModel> listOfSearchAuthor}) = _$AudioStateImpl;
 
   @override
   bool get isPlay;
@@ -516,15 +594,13 @@ abstract class _AudioState implements AudioState {
   @override
   bool get isLoading;
   @override
-  int? get selectIndex;
+  int get selectIndex;
   @override
   List<MusicModel> get listOfMusic;
   @override
   List<String> get listOfDoc;
   @override
   String get localAudioPath;
-  @override
-  bool get darkMode;
   @override
   String get imagePath;
   @override
@@ -537,10 +613,18 @@ abstract class _AudioState implements AudioState {
   dynamic get imageUrl;
   @override
   List<MusicModel> get listOfMusicArtist;
-  @override // @Default([]) List<DocumentSnapshot<MusicModel>> listOfMusic,
+  @override
+  List<MusicModel> get listOfSearchRes;
+  @override
   bool get hasMoreData;
   @override
   DocumentSnapshot<Object?>? get lastDocument;
+  @override
+  bool get isSearchList;
+  @override
+  String get filePath;
+  @override
+  List<AuthorModel> get listOfSearchAuthor;
   @override
   @JsonKey(ignore: true)
   _$$AudioStateImplCopyWith<_$AudioStateImpl> get copyWith =>

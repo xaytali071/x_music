@@ -5,8 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/controller/audio_state/audio_cubit.dart';
 import 'package:xmusic/controller/audio_state/audio_state.dart';
 import 'package:xmusic/model/author_model.dart';
+import 'package:xmusic/viwe/add/add_new_music_file.dart';
 import 'package:xmusic/viwe/add/add_new_music_page.dart';
-import 'package:xmusic/viwe/components/custom_network_image.dart';
+import 'package:xmusic/viwe/components/image/custom_network_image.dart';
 
 import '../../controller/providers.dart';
 
@@ -36,7 +37,23 @@ class _AddNewMusicState extends ConsumerState<AddNewMusic> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (_)=>AddNewMusicPage(authorData: watch.listOfAuthor![index],)));
+                      showModalBottomSheet(context: context, builder: (_){
+                        return Dialog(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ElevatedButton(onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (_)=>AddNewMusicPage(authorData: watch.listOfAuthor[index],)));
+
+                              }, child: Text("Add music url")),
+                              ElevatedButton(onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (_)=>AddNewMusicFile(authorData: watch.listOfAuthor[index],)));
+
+                              }, child: Text("Add music file"))
+                            ],
+                          ),
+                        );
+                      });
                     },
                     child: SizedBox(
                       width: 200.w,

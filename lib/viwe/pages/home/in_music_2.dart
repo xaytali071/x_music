@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:xmusic/model/music_model.dart';
-import 'package:xmusic/viwe/components/custom_network_image.dart';
+import 'package:xmusic/viwe/components/background_widget.dart';
+import 'package:xmusic/viwe/components/button/custom_button.dart';
+import 'package:xmusic/viwe/components/image/custom_network_image.dart';
+import 'package:xmusic/viwe/components/send_rating.dart';
 import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/pages/home/home_page.dart';
-import '../../../controller/audio_state/audio_cubit.dart';
 import '../../../controller/audio_state/audio_state.dart';
 import '../../../controller/providers.dart';
-import '../bottom_bar.dart';
+import '../../components/rating_bar.dart';
 
 class InMusicPage extends ConsumerStatefulWidget {
-  final List<MusicModel>? music;
+  final List<MusicModel> music;
  // final BuildContext context;
 
   final int index;
 
-  InMusicPage({
+  const InMusicPage({
     super.key,
     required this.music,
     required this.index,
@@ -29,29 +31,37 @@ class InMusicPage extends ConsumerStatefulWidget {
 }
 
 class _InMusicPageState extends ConsumerState<InMusicPage> {
+
+  int rating=0;
+  final List<Color> colors = [
+    Colors.red[900]!,
+    Colors.green[900]!,
+    Colors.blue[900]!,
+    Colors.brown[900]!
+  ];
+
+  final List<int> duration = [900, 700, 600, 800, 500];
+
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(audioProvider.notifier).onMode();
-    });
+    print(selIndex);
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     AudioState watch = ref.watch(audioProvider);
     final event = ref.read(audioProvider.notifier);
-    return Scaffold(
-      backgroundColor: watch.darkMode ? Style.blackColor : Style.whiteColor,
-      body:Padding(
+    bool mode=ref.watch(appProvider).darkMode;
+    return BackGroundWidget(
+      child:Padding(
              padding: EdgeInsets.symmetric(horizontal: 20.w),
                child: Column(
+                 mainAxisSize: MainAxisSize.min,
                    children: [
                      100.verticalSpace,
                      CustomImageNetwork(
-                       image: widget.music?[selIndex].artistData?.image ?? "",
+                       image: widget.music[selIndex].artistImage ?? "",
                        width: 250,
                        height: 250,
                        radius: 16,
@@ -59,18 +69,18 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                      10.verticalSpace,
                      Center(
                        child: Text(
-                         widget.music?[selIndex].artistData?.name ?? "",
+                         widget.music[selIndex].artistName ?? "",
                          style: Style.normalText(
-                             color: watch.darkMode
+                             color: mode
                                  ? Style.whiteColor
                                  : Style.blackColor),
                        ),
                      ),
                      Center(
                        child: Text(
-                         widget.music?[selIndex].trackName ?? "",
+                         widget.music[selIndex].trackName ?? "",
                          style: Style.miniText(
-                             color: watch.darkMode
+                             color: mode
                                  ? Style.whiteColor50
                                  : Style.blackColor),
                        ),
@@ -81,12 +91,12 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                              .player
                              .positionStream,
                          builder: (context, snapshot) {
-                           if(snapshot.data==event.player.duration && selIndex!=widget.music!.length-1){
-                             event
-                               ..pause()
-                               ..nextMusic(
-                                   widget.music![++selIndex])..getAudio(widget.music?[selIndex].trackUrl ?? "")..playy();
-                             setState(() {});
+                           if(snapshot.data==event.player.duration && event.player.duration!=null && widget.music.length - 1 != selIndex) {
+                             print("ishladi");
+                             selIndex++;
+                             event.complaeteMusic(music: widget.music,
+                                 index: selIndex,
+                                 );
                            }
                            return ProgressBar(
                              progress: snapshot.data ??
@@ -97,7 +107,17 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                              },
                            );
                          }),
-                     20.verticalSpace,
+                    // 20.verticalSpace,
+                    //  SizedBox(
+                    //    height: 40.h,
+                    //    child: MusicVisualizer(
+                    //      barCount: 30,
+                    //      colors: colors,
+                    //      duration: duration,
+                    //
+                    //    ),
+                    //  ),
+                          20.verticalSpace,
                           Row(
                            mainAxisAlignment:
                                MainAxisAlignment.spaceEvenly,
@@ -111,10 +131,10 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                                      event
                                        ..pause()
                                        ..pervous(
-                                         widget.music![--selIndex],
+                                         widget.music[--selIndex],
                                        )
-                                  ..getAudio(await event.getAudioUrl( widget.music?[selIndex].trackUrl ?? "") ?? "")..playy();
-                                         setState(() {});
+                                  ..getAudio(watch.listOfMusic[selIndex].trackUrl ?? "")..playy();
+                                     //    setState(() {});
                                    }
                                  },
                                  icon: const Icon(
@@ -129,7 +149,7 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                                            .playy()
                                        : event
                                            .pause();
-                                   setState(() {});
+                                  // setState(() {});
                                  },
                                  icon: watch.isPlay
                                      ? const Icon(
@@ -142,13 +162,12 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                                        )),
                              IconButton(
                                  onPressed: () async {
-                                   if ((widget.music?.length ?? 0) - 1 !=
-                                       selIndex) {
+                                   if (widget.music.length - 1 != selIndex) {
                                      event
                                        ..pause()
                                        ..nextMusic(
-                                           widget.music![++selIndex])..getAudio(await event.getAudioUrl(widget.music?[selIndex].trackUrl ?? "") ?? "")..playy();
-                                    setState(() {});
+                                           widget.music[selIndex])..getAudio(watch.listOfMusic[++selIndex].trackUrl ?? "")..playy();
+                                   // setState(() {});
                                    }
                                  },
                                  icon: const Icon(
@@ -157,39 +176,39 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                                  )),
                                DropdownButton(
                                  value: watch.speed,
-                                 dropdownColor: watch.darkMode ? Style.whiteColor50 : Style.blackColor50,
-                                 style: Style.miniText(color:watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                 dropdownColor: mode ? Style.whiteColor50 : Style.blackColor50,
+                                 style: Style.miniText(color:mode ? Style.blackColor50 : Style.whiteColor50),
                                  items: [
                                    DropdownMenuItem(
                                      value: 0.5,
                                      child: Text(
                                        "0.5x",
-                                       style:Style.miniText(color:watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                       style:Style.miniText(color:mode ? Style.blackColor50 : Style.whiteColor50),
                                      ),
                                    ),
                                    DropdownMenuItem(
                                      value: 0.75,
                                      child: Text(
                                        "0.7x",
-                                       style:Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                       style:Style.miniText(color: mode ? Style.blackColor50 : Style.whiteColor50),
                                      ),
                                    ),
                                    DropdownMenuItem(
                                      value: 1.0,
                                      child: Text(
                                        "1.0x",
-                                       style:Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50),
+                                       style:Style.miniText(color: mode ? Style.blackColor50 : Style.whiteColor50),
                                      ),
                                    ),
                                    DropdownMenuItem(
                                      value: 1.5,
                                      child: Text("1.5x",
-                                         style: Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50)),
+                                         style: Style.miniText(color: mode ? Style.blackColor50 : Style.whiteColor50)),
                                    ),
                                    DropdownMenuItem(
                                      value: 2.0,
                                      child: Text("2x",
-                                         style: Style.miniText(color: watch.darkMode ? Style.blackColor50 : Style.whiteColor50)),
+                                         style: Style.miniText(color: mode ? Style.blackColor50 : Style.whiteColor50)),
                                    )
                                  ],
                                    onChanged: (s) {
@@ -200,7 +219,19 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
                                ),
 
                            ],
-                         )
+                         ),
+                      20.verticalSpace,
+                     CustomRatingBar(rating: widget.music[selIndex].rating?.toDouble() ?? 0 / (widget.music[selIndex].userIdList?.length ?? 0),size: 25,),
+
+                     20.verticalSpace,
+                     CustomButton(text: "Rating", onTap: (){
+                       showModalBottomSheet(
+                           backgroundColor: Style.transperntColor,
+                           context: context, builder: (_){
+                         return SendRating(movie:widget.music[selIndex] , docId: widget.music[selIndex].id ?? "");
+                       });
+                     }),
+
 
                    ],
                  )
@@ -208,7 +239,6 @@ class _InMusicPageState extends ConsumerState<InMusicPage> {
            ),
     );
 
-
-
   }
+
 }

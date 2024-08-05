@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xmusic/controller/app_controller/app_state.dart';
 import 'package:xmusic/controller/providers.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
+import 'package:xmusic/viwe/components/style.dart';
 import 'package:xmusic/viwe/pages/home/dwower_widget.dart';
 
 class BackGroundWidget extends ConsumerStatefulWidget {
@@ -30,10 +31,22 @@ class _BackGroundWidgetState extends ConsumerState<BackGroundWidget> {
           width: MediaQuery.sizeOf(context).width,
           height: MediaQuery.sizeOf(context).height,
           decoration:  BoxDecoration(
-              image: DecorationImage(
-                  image: watch.darkMode ? const AssetImage("assets/BackgroundDark.png",) : const AssetImage("assets/Background.png"),
-                  fit: BoxFit.cover
-              )
+            color: watch.darkMode ? Style.blackColor : Style.primaryColor,
+              gradient: watch.darkMode ? const LinearGradient(
+                begin: Alignment.topLeft,
+
+                colors: [
+                  Style.darkPrimaryColor,
+                  Style.blackColor,
+
+                ]
+              ) : const LinearGradient(
+                  begin: Alignment.topLeft,
+                  colors: [
+                Style.primaryColor,
+                Style.primaryColor,
+                Style.whiteColor,
+              ]),
           ),
           child:widget.child,
         )

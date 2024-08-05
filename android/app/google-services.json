@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "623585268228-vad1m7hhrvv4ma1mgk7q9n5g37ntq4pi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uz.xmusic",
+            "certificate_hash": "8bc32cdcf7f30dbe478869b0c3d1f7c13f660713"
+          }
+        },
+        {
           "client_id": "623585268228-td3vjlfkf7hvf9s0su8g56gvpl4gvds6.apps.googleusercontent.com",
           "client_type": 3
         }

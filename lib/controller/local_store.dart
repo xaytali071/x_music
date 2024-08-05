@@ -23,7 +23,7 @@ class LocaleStore {
     store.setBool("mode", value);
   }
 
-  static getMode()=> store?.getBool("mode");
+  static getMode()=> store?.getBool("mode") ?? false;
 
   static storeClear() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

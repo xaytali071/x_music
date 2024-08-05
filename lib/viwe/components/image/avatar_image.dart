@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,7 +26,7 @@ class AvatarImage extends StatelessWidget {
         child: Center(
           child: Icon(Icons.person,size: size-10.r,color: Style.blackColor50,),
         )
-    ) : Container(
+    ) : image.contains("http") ? Container(
       width: size.w,
       height: size.h,
       decoration: BoxDecoration(
@@ -32,6 +34,17 @@ class AvatarImage extends StatelessWidget {
         color: Style.primaryColor,
         image: DecorationImage(
             image: NetworkImage(image),
+            fit: BoxFit.cover
+        ),
+      ),
+    ) : Container(
+      width: size.w,
+      height: size.h,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Style.primaryColor,
+        image: DecorationImage(
+            image: FileImage(File(image)),
             fit: BoxFit.cover
         ),
       ),

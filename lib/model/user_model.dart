@@ -3,12 +3,16 @@ class UserModel {
   final String? password;
   final String? avatar;
   final String? email;
+  final String? fcm;
+  final String? model;
 
   UserModel(
-      {required this.name,
-        required this.password,
+      { this.name,
+         this.password,
         this.avatar,
-        required this.email,
+         this.email,
+         this.fcm,
+         this.model,
       });
 
   factory UserModel.fromJson({Map? data,}) {
@@ -17,6 +21,8 @@ class UserModel {
         password: data?["password"],
         avatar: data?["avatar"],
         email: data?["email"],
+      fcm: data?["fcm"],
+      model: data?["model"],
     );
   }
 
@@ -26,6 +32,8 @@ class UserModel {
       "password": password,
       "avatar": avatar,
       "email": email,
+      "fcm":fcm,
+      "model":model
     };
   }
 }
