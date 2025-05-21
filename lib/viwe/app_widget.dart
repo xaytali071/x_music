@@ -1,12 +1,7 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/viwe/pages/auth/register_page.dart';
 import 'package:xmusic/viwe/pages/auth/spalash_screen.dart';
-import 'package:xmusic/viwe/pages/bottom_bar.dart';
-
-import '../controller/local_store.dart';
 import '../controller/providers.dart';
 
 

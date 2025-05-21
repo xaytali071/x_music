@@ -1,8 +1,6 @@
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:xmusic/controller/app_controller/app_state.dart';
 import 'package:xmusic/viwe/pages/home/muz.dart';
 import 'package:xmusic/viwe/pages/home/search_page.dart';
 

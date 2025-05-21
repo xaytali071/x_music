@@ -14,8 +14,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:xmusic/model/author_model.dart';
 import 'package:xmusic/model/music_model.dart';
 import 'package:xmusic/viwe/pages/home/home_page.dart';
-import '../../model/rating_model.dart';
-import '../local_store.dart';
 import 'audio_state.dart';
 
 class AudioNotifire extends StateNotifier<AudioState> {
@@ -100,7 +98,9 @@ class AudioNotifire extends StateNotifier<AudioState> {
   }
 
   sielend() {
-    state = (state.copyWith(isSilent: state.isSilent != state.isSilent));
+    bool s=state.isSilent;
+    s=s=!s;
+    state = (state.copyWith(isSilent: s));
     state.isSilent ? player.setVolume(0) : player.setVolume(1);
   }
 
@@ -285,7 +285,7 @@ class AudioNotifire extends StateNotifier<AudioState> {
     Query query = FirebaseFirestore.instance
         .collection('music')
         .orderBy('trackName',)
-        .limit(7);
+        .limit(8);
 
     if (state.lastDocument != null) {
       query = query.startAfterDocument(state.lastDocument!);

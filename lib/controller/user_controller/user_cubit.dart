@@ -249,7 +249,8 @@ class UserNotifire extends StateNotifier<UserState> {
   loginFacebook({required VoidCallback? onSuccess}) async {
     state = (state.copyWith(isFacebookLoading: true));
     final fb = FacebookLogin();
-    final user = await fb.logIn(permissions: [
+    final user = await fb.logIn
+      (permissions: [
       FacebookPermission.email,
       FacebookPermission.publicProfile
     ]);

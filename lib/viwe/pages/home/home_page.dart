@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,10 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:xmusic/controller/providers.dart';
 import 'package:xmusic/controller/user_controller/user_state.dart';
-import 'package:xmusic/viwe/add/HomePage2.dart';
-import 'package:xmusic/viwe/components/image/avatar_image.dart';
 import 'package:xmusic/viwe/components/background_widget.dart';
-
 import 'package:xmusic/viwe/components/button/button_effect.dart';
 import 'package:xmusic/viwe/components/custom_category.dart';
 import 'package:xmusic/viwe/components/notification_widget.dart';
